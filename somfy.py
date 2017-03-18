@@ -18,7 +18,7 @@ boutonBas = 0x4
 frame = bytearray(7)
 
 homeLocation = ephem.Observer()
-homeLocation.lat, homeLocation.lon = '42.764457', '5.066435' #PUT YOUR DAMN COORDINATES (check on Google Maps for instance)
+homeLocation.lat, homeLocation.lon = '42.764457', '5.066435' #PUT YOUR OWN COORDINATES HERE (check on Google Maps for instance)
 locale.setlocale(locale.LC_TIME,'')
 
 
