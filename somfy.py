@@ -14,6 +14,7 @@ TXGPIO=4 # 433.42 MHz emitter on GPIO 4
 boutonHaut = 0x2
 boutonStop = 0x1
 boutonBas = 0x4
+boutonProg = 0x8
 
 frame = bytearray(7)
 
@@ -85,7 +86,7 @@ def envoi_commande(telco, bouton): #Sending a frame
       print "0x%0.2X" % octet,
    print ""
 
-#This is where all the awesomeness is happening. You're telling the daemon what you wana send
+#This is where all the awesomeness is happening. You're telling the daemon what you wanna send
    wf=[]
    wf.append(pigpio.pulse(1<<TXGPIO, 0, 9415))
    wf.append(pigpio.pulse(0, 1<<TXGPIO, 89565))
