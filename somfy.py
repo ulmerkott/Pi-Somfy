@@ -100,7 +100,7 @@ def envoi_commande(telco, bouton, repetition): #Sending a frame
       wf.append(pigpio.pulse(1<<TXGPIO, 0, 2560))
       wf.append(pigpio.pulse(0, 1<<TXGPIO, 2560))
    wf.append(pigpio.pulse(1<<TXGPIO, 0, 4550)) # software synchronization
-   wf.append(pigpio.pulse(0, 1<<TXGPIO,  604))
+   wf.append(pigpio.pulse(0, 1<<TXGPIO,  640))
 
    for i in range (0, 56): # manchester enconding of payload data
       if ((frame[i/8] >> (7 - (i%8))) & 1):
