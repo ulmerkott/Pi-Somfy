@@ -121,11 +121,11 @@ def envoi_commande(telco, bouton, repetition): #Sending a frame
 
             for i in range (0, 56): # manchester enconding of payload data
                   if ((frame[i/8] >> (7 - (i%8))) & 1):
-                  wf.append(pigpio.pulse(0, 1<<TXGPIO, 640))
-                  wf.append(pigpio.pulse(1<<TXGPIO, 0, 640))
+                        wf.append(pigpio.pulse(0, 1<<TXGPIO, 640))
+                        wf.append(pigpio.pulse(1<<TXGPIO, 0, 640))
                   else:
-                  wf.append(pigpio.pulse(1<<TXGPIO, 0, 640))
-                  wf.append(pigpio.pulse(0, 1<<TXGPIO, 640))
+                        wf.append(pigpio.pulse(1<<TXGPIO, 0, 640))
+                        wf.append(pigpio.pulse(0, 1<<TXGPIO, 640))
 
             wf.append(pigpio.pulse(0, 1<<TXGPIO, 30415)) # interframe gap
 
