@@ -2,25 +2,26 @@
 
 ## 1 Overview
 
-This project allows to operate multiple Somfy Shutter with a Raspberry Pi with cheap hardware costing less than $2. It comes with a command line interface, a web interface and an Amazon Alexa interface. 
+This project allows to operate multiple Somfy Shutters with a Raspberry Pi with cheap hardware costing less than $2. It comes with a command line interface, a web interface and an Amazon Alexa interface. 
 
 ## 2 Hardware
 
-This project has been developed and tested with a Raspberry Pi 3 as the base platform. Since the serial port and network are the only external ports used, the program could be used on other platforms with minor modifications and testing.
+This project has been developed and tested with a Raspberry Pi B+ and a Raspberry Pi  3 as the base platforms. Since the serial port and network are the only external ports used, the program could be used on other platforms with minor modifications and testing.
 
-In development and testing I used the Raspberry Pi3 both with Wi-Fi connectivity and Ethernet cable. Note that the hardware has to be reasonably close to the shutters you operate, as the signal strength will otherwise not be sufficient.
+Wi-Fi connectivity and Ethernet cable should both work. Note that the hardware has to be reasonably close (i.e. in the same house or in the same aisle of your mansion: just like a physical remote) to the shutters you operate, as the signal strength will otherwise not be sufficient.
 
 As of now, you have to build your own hardware. Here are the steps to do so.
-1. You need the RF Transmitter. If you wish to order it from eBay, this link maybe helpful: <br/>[Order](https://www.ebay.com/sch/sis.html?_nkw=5x+433Mhz+RF+transmitter+and+receiver+kit+Module+Arduino+ARM+WL+MCU+Raspberry).<br/>Note that I bricked my first Transmitter when soldering, so ordering more than one may be a good idea.
+1. You need the RF Transmitter. If you wish to order it from eBay, this link maybe helpful: <br/>[Order](https://www.ebay.com/sch/sis.html?_nkw=5x+433Mhz+RF+transmitter+and+receiver+kit+Module+Arduino+ARM+WL+MCU+Raspberry).<br/>Note that desoldering a 3 pin component isn't trivial, so ordering more than one may be a good idea in case of a screw up.
 1. You need an oscillator for a 433.42 MHz frequency. The above RF transmitter comes with a common 433.93 MHz one, which will not work with your Somfy shutter. If you wish to order it from eBay, this link maybe helpful: <br/>[Order](https://www.ebay.com/sch/sis.html?_nkw=433.42M+R433+F433+SAW+Resonator+Crystals+TO-39)
 1. You will need cables to connect the transmitter to the Raspberry Pi. Any cable will do obviously, but I found these quite helpful. <br/>[Order](https://www.ebay.com/itm/40Pin-Multicolored-Dupont-Wire-Kits-Breadboard-Female-Jumper-Ribbon-Cable/113310899442)
 
-Once you have all the hardware handy, now it's time to exchange the oscillator, which requires a bit of soldering. Reason for this is that the emitter you bought uses a common 433.93 MHz frequency, Somfy however requires a 433.__42__ MHz frequency. Take the following 3 easy steps to exchange the oscillator
+Once you have all the hardware handy, it's now time to swap the oscillator, which requires a bit of soldering. Reason for this is that the emitter you bought uses a common 433.93 MHz frequency, Somfy however requires a 433.__42__ MHz frequency. Take the following steps to exchange the oscillator
 1. Identify the oscillator. It looks like this (marked with a red circle): <br/>![Front view](documentation/RF%20Transmitter%20front.jpg). <br/>Turn the RF Transmitter around. You will see that the oscillator is soldered in on 3 points <br/>![Back View](documentation/RF%20Transmitter%20back.jpg). 
 1. While pulling the oscillator from the front, heat up the 3 soldering point on the back with the soldering iron until the oscillator is detached from the board. 
+1. Clean up the remaining solder mess on bith desoldering braid or a desoldering pump
 1. Now put in the new oscillator (make sure all 3 pins connect through the print) and solder it in again.
 
-And you are done! As mentioned above, I got step 3 wrong the first time round. One of the pins was not properly connected and I was lucky I ordered spare emitters and oscillators
+And you are done!
 
 Now the last step is to connect your adjusted RF transmitter to your Raspberry Pi. Use the following diagram to help you connect it 
 
@@ -28,7 +29,7 @@ Now the last step is to connect your adjusted RF transmitter to your Raspberry P
 
 Note that I used GPIO 4 but you can change the value of __TXGPIO__ to whatever you want if you choose a different way to connect your RF emitter. This is a configuration parameter in operateShutters.conf.
 
-OK. now this all should look like this. Note that some of the pictures are a bit confusing with regards to which GPIO a cable connects to. The above diagram easier to see. But if you struggle, maybe the [Wiring Diagram](documentation/Wiring%20Diagram.txt) helps.
+OK. now this all should look like this. Note that some of the pictures are a bit confusing with regards to which GPIO a cable connects to. It's easier to see on the above diagram. But if you struggle, maybe the [Wiring Diagram](documentation/Wiring%20Diagram.txt) helps.
 
 
 ![Full Picture](documentation/Full%20Assembly.jpg)<br/>
@@ -43,16 +44,19 @@ If you are not familiar with remote login commands for Linux/Unix, two useful co
 
 The Raspberry Pi organization has documentation on installing an operating system on your Raspberry Pi. It is located [here](https://www.raspberrypi.org/documentation/installation/installing-images/README.md).
 
-So ssh into your Raspberry Pi and you should find that you are in the directory /home/pi. 
+One the Pi has its basic setup (an operating system and an internet connection) working, ssh into your Raspberry Pi and you should find that you are in the directory /home/pi. Note: if you prefer not to use a headless system, you can also open a terminal windows directly on the Pi.
 
-The next step is to download the Pi-Somfy project files to your Raspberry Pi. The easiest way to do this is to use the "git" program. Most Raspberry Pi distributions include the git program (except Debian Lite). If your distribution does not include git then type:
+The next step is to download the Pi-Somfy project files to your Raspberry Pi. The easiest way to do this is to use the "git" program. Most Raspberry Pi distributions include the git program (except Debian Lite).
+
+Whether or not it is already installed, it's good practice to type the following:
 
     sudo apt-get update
     sudo apt-get install git
+(If git isn't installed, it will install it; if it was previously, it will update it)
 
 Once git is installed on your system, make sure you are in the /home/pi directory, then type:
 
-    git clone https://github.com/MichaelB2018/Pi-Somfy.git
+    git clone https://github.com/Nickduino/Pi-Somfy.git
 
 The above command will make a directory in /home/pi named Pi-Somfy and put the project files in this directory.
 
@@ -81,15 +85,15 @@ If you decided to use Python 2, the last command will read instead:
 
 Next, let's test if it all works. Start <operateShutters.py> by typing:
 
-    sudo /home/pi/Pi-Somfy/operateShutters.py
+    sudo python /home/pi/Pi-Somfy/operateShutters.py
 
 You should see the help text explaining the [Command Line Interface](documentation/p4.png)
 
 ## 4 Usage
 
-Note that the config file won't exists the first time you run the application. In that case, a new config file will be created based on the name you specified (e.g. /home/pi/Pi-Somfy/operateShutters.conf).
+Note that the config file won't exists the first time you run the application. In that case, a new config file will be created based on the name you specified (e.g. /home/pi/Pi-Somfy/operateShutters.conf). Once it has been created, you can modify it to change your need (SSL or not, which port is used, etc.), it will not be erased with an update. If you messed up something, just delete it and relaunch operateShutters.py, a new vanilla copy will be generated.
 
-You have 4 ways to operate. The recommended operations mode is mode 4. But the other 3 modes are explained here for completeness:
+You have 4 ways to operate. The recommended operation mode is mode 4. But the other 3 modes are explained here for completeness:
 
 1. Command line Interface<br/>You can use either of the following commands to operate a shutter called corridor<br/>   
 The first one will raise the shutter. The second one will lower the shutter. The third one - **without starting the web interface** - will lower the shutter at sunset and raise it again 60 minutes after sunrise.
@@ -101,12 +105,12 @@ sudo /home/pi/Pi-Somfy/operateShutters.py corridor -c /home/pi/Pi-Somfy/operateS
 
 2. Manually start Web interface only<br/>You can start the web-interface by typing:<br/>Once started, you can access the web interface at http://IPaddressOfYouPi:80. From there you can further modify your settings.   
 ```csh
-    sudo /home/pi/Pi-Somfy/operateShutters.py -c /home/pi/Pi-Somfy/operateShutters.conf -a 
+    sudo python /home/pi/Pi-Somfy/operateShutters.py -c /home/pi/Pi-Somfy/operateShutters.conf -a 
 ```    
 
 3. Manually start Web interface and Alexa interface<br/>You can start the web-interface by typing:
 ```csh
-    sudo /home/pi/Pi-Somfy/operateShutters.py -c /home/pi/Pi-Somfy/operateShutters.conf -a -e
+    sudo python /home/pi/Pi-Somfy/operateShutters.py -c /home/pi/Pi-Somfy/operateShutters.conf -a -e
 ```    
 
 4. Finally, the recommended way to operate it is using crontab on boot time. You can do so by typing:
@@ -115,8 +119,8 @@ sudo /home/pi/Pi-Somfy/operateShutters.py corridor -c /home/pi/Pi-Somfy/operateS
 ```
 Note, that "crontab -e" will just open a console-based text editor that you can edit the crontab script. The first time you run "crontab -e" you will be prompted to choose the editor. I recommend nano. From the crontab window, add the following to the bottom of the crontab script
 
-    @reboot sleep 60;/home/pi/Pi-Somfy/operateShutters.py -c /home/pi/Pi-Somfy/operateShutters.conf -a -e
-    0 * * * * /home/pi/Pi-Somfy/operateShutters.py -c /home/pi/Pi-Somfy/operateShutters.conf -a -e 
+    @reboot sleep 60;python /home/pi/Pi-Somfy/operateShutters.py -c /home/pi/Pi-Somfy/operateShutters.conf -a -e
+    0 * * * * python /home/pi/Pi-Somfy/operateShutters.py -c /home/pi/Pi-Somfy/operateShutters.conf -a -e 
 
 And save the crontab schedule. (if using nano type press ctrl-o to save the file, ctrl-x to exit nano). Now, every time your system is booted operateShutters will start.
 
@@ -156,7 +160,7 @@ If you prefer to state the likes of "Alexa, OPEN the shutter" or "Alexa, CLOSE t
 
 
 ## 7 Credits
-This Library was ported from [Arduino sketch](https://github.com/Nickduino/Somfy_Remote) onto the Pi by @Nickduino to open and close my blinds automatically. 
+This Library was ported from [Arduino sketch](https://github.com/Nickduino/Somfy_Remote) onto the Pi by @Nickduino to open and close his blinds automatically. 
 
 If you want to learn more about the Somfy RTS protocol, check out [Pushtack](https://pushstack.wordpress.com/somfy-rts-protocol/). 
 
