@@ -6,7 +6,7 @@ This project allows to operate multiple Somfy Shutters with a Raspberry Pi with 
 
 ## 2 Hardware
 
-This project has been developed and tested with a Raspberry Pi B+ and a Raspberry Pi  3 as the base platforms. Since the serial port and network are the only external ports used, the program could be used on other platforms with minor modifications and testing.
+This project has been developed and tested with a Raspberry Pi B+ and a Raspberry Pi 3 as the base platforms. Since the serial port and network are the only external ports used, the program could be used on other platforms with minor modifications and testing.
 
 Wi-Fi connectivity and Ethernet cable should both work. Note that the hardware has to be reasonably close (i.e. in the same house or in the same aisle of your mansion: just like a physical remote) to the shutters you operate, as the signal strength will otherwise not be sufficient.
 
