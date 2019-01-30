@@ -96,8 +96,29 @@ Note that the config file won't exists the first time you run the application. I
 
 You have 4 ways to operate. The recommended operation mode is mode 4. But the other 3 modes are explained here for completeness:
 
-1. Command line Interface<br/>You can use either of the following commands to operate a shutter called corridor<br/>   
-The first one will raise the shutter. The second one will lower the shutter. The third one - **without starting the web interface** - will lower the shutter at sunset and raise it again 60 minutes after sunrise.
+1. Command line Interface<br/>You can use either of the following commands to operate a shutter called<br/>
+
+**Arguments:**
+
+    shutterName                             Name of the Shutter
+    -h, --help                              show this help message and exit
+    -config CONFIGFILE, -c CONFIGFILE       Name of the Config File (incl full Path)
+    -up, -u                                 Raise the Shutter
+    -down, -d                               lower the Shutter
+    -stop, -s                               stop the Shutter
+    -program, -p                            send a program signal
+    -demo                                   lower the Shutter, Stop after 7 second, then raise the Shutter
+    -duskdawn DUSKDAWN DUSKDAWN, -dd DUSKDAWN DUSKDAWN
+                                          Automatically lower the shutter at sunset and rise the
+                                          shutter at sunrise, provide the evening delay and
+                                          morning delay in minutes each
+    -auto, -a                               Run schedule based on config. Also will start up the web-server which can be used to setup the schedule.
+
+    -echo, -e                               Enable Amazon Alexa (Echo) integration
+
+
+**Examples:**
+All three command the shutter named corridor. The first one will raise it. The second one will lower it. The third one will lower the shutter at sunset and raise it again 60 minutes after sunrise.
 ```csh
 sudo /home/pi/Pi-Somfy/operateShutters.py corridor -c /home/pi/Pi-Somfy/operateShutters.conf -u
 sudo /home/pi/Pi-Somfy/operateShutters.py corridor -c /home/pi/Pi-Somfy/operateShutters.conf -d
