@@ -22,7 +22,7 @@ Once you have all the hardware handy, now it's time to exchange the oscillator, 
 
 And you are done! As mentioned above, I got step 3 wrong the first time round. One of the pins was not properly connected and I was lucky I ordered spare emitters and oscillators
 
-Now the last step is to connect you adjusted RF transmitter to your Raspberry Pi. Use the following diagram to help you connect it 
+Now the last step is to connect your adjusted RF transmitter to your Raspberry Pi. Use the following diagram to help you connect it 
 
 ![Diagram](documentation/Wiring%20Diagram.png)
 
@@ -87,7 +87,7 @@ You should see the help text explaining the [Command Line Interface](documentati
 
 ## 4 Usage
 
-Note that the config file won't exists the first time you run the application. In that case, a new config file will be reated based on the name you specified (e.g. /home/pi/Pi-Somfy/operateShutters.conf).
+Note that the config file won't exists the first time you run the application. In that case, a new config file will be created based on the name you specified (e.g. /home/pi/Pi-Somfy/operateShutters.conf).
 
 You have 4 ways to operate. The recommended operations mode is mode 4. But the other 3 modes are explained here for completeness:
 
