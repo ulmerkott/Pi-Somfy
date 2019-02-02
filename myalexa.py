@@ -86,7 +86,6 @@ class Alexa(threading.Thread, MyLog, debounce_handler):
                 time.sleep(0.01)
             except Exception as e:
                 self.LogError("Critical exception: "+ str(e.args))
-		print(str(e.args))
                 break
             
         self.LogError("Received Signal to shut down Alexa thread")
