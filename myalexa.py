@@ -71,8 +71,11 @@ class Alexa(threading.Thread, MyLog, debounce_handler):
         dbh = device_handler(log=self.log, shutter=self.shutter, config=self.config)
         myport = 520
         for shutter, shutterId in sorted(self.config.ShuttersByName.items(), key=lambda kv: kv[1]):
-            fauxmo.fauxmo(shutter, self.upnp_responder, self.poller, None, myport*100, dbh, log=self.log)
-            myport += 1
+            self.LogInfo ("===========ID=========== : " + str(int(shutterId,16)))
+            portId = 50000 + (abs(int(shutterId,16)) % 10000)
+            self.LogInfo ("==========PORT========== : " + str(portId))
+            fauxmo.fauxmo(shutter, self.upnp_responder, self.poller, None, portId, dbh, log=self.log)
+#            myport += 1
                         
         return
 
@@ -91,3 +94,4 @@ class Alexa(threading.Thread, MyLog, debounce_handler):
         self.LogError("Received Signal to shut down Alexa thread")
         return
 
+ 
