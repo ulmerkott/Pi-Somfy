@@ -209,7 +209,8 @@ class operateShutters(MyLog):
 
         if not os.path.isfile(self.ConfigFile):
             self.LogConsole("Creating new config file : " + self.ConfigFile)
-            defaultConfigFile = os.path.dirname(__file__)+'/defaultConfig.conf'
+            defaultConfigFile = os.path.dirname(os.path.realpath(__file__))+'/defaultConfig.conf'
+            print(defaultConfigFile);
             if not os.path.isfile(defaultConfigFile):
                 self.LogConsole("Failure to create new config file: "+defaultConfigFile)
                 sys.exit(1)
@@ -286,11 +287,11 @@ class operateShutters(MyLog):
        
        if not status:  # if it was started successfully (or was already running)...
            pigpiod_process = process
-           self.LogInfo ("pigpiod is running, process ID is {} ".format(pigpiod_process))
+           self.LogError ("pigpiod is running, process ID is {} ".format(pigpiod_process))
        
            try:
                pi = pigpio.pi()  # local GPIO only
-               self.LogInfo ("pigpio's pi instantiated")
+               self.LogError ("pigpio's pi instantiated")
            except Exception as e:
                start_pigpiod_exception = str(e)
                self.LogError ("problem instantiating pi: {}".format(start_pigpiod_exception))
@@ -333,7 +334,7 @@ class operateShutters(MyLog):
              if (args.echo == True):
                  self.alexa.setDaemon(True)
                  self.alexa.start()
-             self.webServer = FlaskAppWrapper(name='WebServer', static_url_path=os.path.dirname(__file__)+'/html', log = self.log, shutter = self.shutter, schedule = self.schedule, config = self.config)
+             self.webServer = FlaskAppWrapper(name='WebServer', static_url_path=os.path.dirname(os.path.realpath(__file__))+'/html', log = self.log, shutter = self.shutter, schedule = self.schedule, config = self.config)
              self.webServer.run()
        else:
           parser.print_help()

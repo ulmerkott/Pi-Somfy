@@ -127,7 +127,12 @@ class FlaskAppWrapper(MyLog):
         return {'status': 'OK'}
 
     def addShutter(self, params):
-        name = params.get('name', 0, type=str)
+        if sys.version_info[0] < 3:
+            import unicodedata
+            name = params.get('name', 0, type=unicode)
+            name = unicodedata.normalize('NFKD', name).encode('ascii','ignore')
+        else: 
+            name = params.get('name', 0, type=str)
         self.LogDebug("add shutter: "+ name)
         if (name in self.config.ShuttersByName):
             return {'status': 'ERROR', 'message': 'Name is not unique'}
@@ -153,7 +158,12 @@ class FlaskAppWrapper(MyLog):
 
     def editShutter(self, params):
         id = params.get('id', 0, type=str)
-        name = params.get('name', 0, type=str)
+        if sys.version_info[0] < 3:
+            import unicodedata
+            name = params.get('name', 0, type=unicode)
+            name = unicodedata.normalize('NFKD', name).encode('ascii','ignore')
+        else:
+            name = params.get('name', 0, type=str)
         self.LogDebug("edit shutter: "+id+" / "+name)
         if (not id in self.config.Shutters):
             return {'status': 'ERROR', 'message': 'Shutter does not exist'}
@@ -161,8 +171,8 @@ class FlaskAppWrapper(MyLog):
             return {'status': 'ERROR', 'message': 'Name has not changed, remaining the same.'}
         elif (name in self.config.ShuttersByName):
             return {'status': 'ERROR', 'message': 'Name is not unique'}
-        elif (("," in name) or (" " in name)):
-            return {'status': 'ERROR', 'message': 'New name can not contain SPACES or COMMAS'}
+        elif ("," in name):
+            return {'status': 'ERROR', 'message': 'New name can not contain COMMAS'}
         else:
             self.config.WriteValue(str(id), str(name)+",True", section="Shutters");
             self.config.ShuttersByName.pop(self.config.Shutters[id]['name'], None)

@@ -353,7 +353,7 @@ class upnp_broadcast_responder(MyLog, object):
             try:
                 self.ssock.bind(('',self.port))
             except Exception:
-                self.LogWarn("WARNING: Failed to bind %s:%d: %s" , (self.ip,self.port))
+                self.LogWarn("WARNING: Failed to bind %s:%d" % (self.ip,self.port))
                 ok = False
 
             try:
