@@ -86,7 +86,7 @@ class Shutter(MyLog):
            checksum = 0
            
            teleco = int(shutterId, 16)
-           code = int(self.config.Shutters[shutterId]['code'])
+           code = int(self.config.Shutters[shutterId.upper()]['code'])
         
            # print (codecs.encode(shutterId, 'hex_codec'))
            self.config.setCode(shutterId, code+1)
@@ -270,7 +270,7 @@ class operateShutters(MyLog):
            import commands
            status, process = commands.getstatusoutput('sudo pidof pigpiod')
            if status:  #  it wasn't running, so start it
-               self.LogInfo ("pigpiod was not running")
+               self.LogError ("pigpiod was not running")
                commands.getstatusoutput('sudo pigpiod')  # try to  start it
                time.sleep(0.5)
                # check it again        
@@ -279,7 +279,7 @@ class operateShutters(MyLog):
            import subprocess
            status, process = subprocess.getstatusoutput('sudo pidof pigpiod')
            if status:  #  it wasn't running, so start it
-               self.LogInfo ("pigpiod was not running")
+               self.LogError ("pigpiod was not running")
                subprocess.getstatusoutput('sudo pigpiod')  # try to  start it
                time.sleep(0.5)
                # check it again        
@@ -287,11 +287,11 @@ class operateShutters(MyLog):
        
        if not status:  # if it was started successfully (or was already running)...
            pigpiod_process = process
-           self.LogInfo ("pigpiod is running, process ID is {} ".format(pigpiod_process))
+           self.LogError ("pigpiod is running, process ID is {} ".format(pigpiod_process))
        
            try:
                pi = pigpio.pi()  # local GPIO only
-               self.LogInfo ("pigpio's pi instantiated")
+               self.LogError ("pigpio's pi instantiated")
            except Exception as e:
                start_pigpiod_exception = str(e)
                self.LogError ("problem instantiating pi: {}".format(start_pigpiod_exception))

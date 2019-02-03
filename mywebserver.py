@@ -147,7 +147,7 @@ class FlaskAppWrapper(MyLog):
                 for key in self.config.Shutters:
                     if tmp_id == int(key, 16):
                         conflict = True
-            id = "0x%0.2X" % tmp_id
+            id = ("0x%0.2X" % tmp_id).upper()
             code = 1
             self.LogDebug("got a new shutter id: "+id)
             self.config.WriteValue(str(id), str(name)+",True", section="Shutters");
@@ -157,7 +157,7 @@ class FlaskAppWrapper(MyLog):
             return {'status': 'OK', 'id': id}
 
     def editShutter(self, params):
-        id = params.get('id', 0, type=str)
+        id = params.get('id', 0, type=str).upper()
         if sys.version_info[0] < 3:
             import unicodedata
             name = params.get('name', 0, type=unicode)
@@ -181,7 +181,7 @@ class FlaskAppWrapper(MyLog):
             return {'status': 'OK'}
 
     def deleteShutter(self, params):
-        id = params.get('id', 0, type=str)
+        id = params.get('id', 0, type=str).upper()
         self.LogDebug("delete shutter: "+id)
         if (not id in self.config.Shutters):
             return {'status': 'ERROR', 'message': 'Shutter does not exist'}
