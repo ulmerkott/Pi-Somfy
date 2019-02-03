@@ -9,7 +9,6 @@ GetStartupInfo(true);
 $(document).ready(function() {
     resizeDiv();
     setupListeners();
-
 });
 
 window.onresize = function(event) {
@@ -39,6 +38,19 @@ function GetStartupInfo(initMap)
                config = result;
                setupTableShutters();
                setupTableSchedule();
+               if (config.Longitude == 0) {
+                   $('.panel-collapse.in').collapse('toggle'); 
+                   $('#collapseOne').collapse('toggle');
+               } else if (Object.keys(config.Shutters).length == 0){
+                   $('.panel-collapse.in').collapse('toggle'); 
+                   $('#collapseTwo').collapse('toggle');
+               } else if (Object.keys(config.Schedule).length == 0) {
+                   $('.panel-collapse.in').collapse('toggle'); 
+                   $('#collapseFour').collapse('toggle');
+               } else {
+                   $('.panel-collapse.in').collapse('toggle'); 
+                   $('#collapseThree').collapse('toggle');
+               }
                $(".loader").removeClass("is-active");
             });
 }
