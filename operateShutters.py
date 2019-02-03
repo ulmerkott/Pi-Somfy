@@ -86,7 +86,7 @@ class Shutter(MyLog):
            checksum = 0
            
            teleco = int(shutterId, 16)
-           code = int(self.config.Shutters[shutterId.upper()]['code'])
+           code = int(self.config.Shutters[shutterId]['code'])
         
            # print (codecs.encode(shutterId, 'hex_codec'))
            self.config.setCode(shutterId, code+1)
@@ -287,7 +287,7 @@ class operateShutters(MyLog):
        
        if not status:  # if it was started successfully (or was already running)...
            pigpiod_process = process
-           self.LogError ("pigpiod is running, process ID is {} ".format(pigpiod_process))
+           self.LogInfo ("pigpiod is running, process ID is {} ".format(pigpiod_process))
        
            try:
                pi = pigpio.pi()  # local GPIO only

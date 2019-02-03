@@ -65,11 +65,11 @@ class MyConfig (MyLog):
             try:
                 param1 = value.split(",")
                 if param1[1].strip().lower() == 'true':
-                   param2 = int(self.ReadValue(key.upper(), section="ShutterRollingCodes", return_type=int))
-                   self.Shutters[key.upper()] = {'name': param1[0], 'code': param2}
-                   self.ShuttersByName[param1[0]] = key.upper()
+                   param2 = int(self.ReadValue(key, section="ShutterRollingCodes", return_type=int))
+                   self.Shutters[key] = {'name': param1[0], 'code': param2}
+                   self.ShuttersByName[param1[0]] = key
             except Exception as e1:
-                self.LogErrorLine("Missing config file or config file entries in Section Shutters for key "+key.upper()+": " + str(e1))
+                self.LogErrorLine("Missing config file or config file entries in Section Shutters for key "+key+": " + str(e1))
                 return False
                                    
         self.SetSection("Scheduler")
@@ -94,8 +94,8 @@ class MyConfig (MyLog):
 
     #---------------------MyConfig::setCode---------------------------------
     def setCode(self, shutterId, code):
-        self.WriteValue(shutterId.upper(), str(code), section="ShutterRollingCodes");
-        self.Shutters[shutterId.upper()]['code'] = code
+        self.WriteValue(shutterId, str(code), section="ShutterRollingCodes");
+        self.Shutters[shutterId]['code'] = code
         
 
     #---------------------MyConfig::HasOption-----------------------------------
