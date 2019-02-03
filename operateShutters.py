@@ -270,7 +270,7 @@ class operateShutters(MyLog):
            import commands
            status, process = commands.getstatusoutput('sudo pidof pigpiod')
            if status:  #  it wasn't running, so start it
-               self.LogError ("pigpiod was not running")
+               self.LogInfo ("pigpiod was not running")
                commands.getstatusoutput('sudo pigpiod')  # try to  start it
                time.sleep(0.5)
                # check it again        
@@ -279,7 +279,7 @@ class operateShutters(MyLog):
            import subprocess
            status, process = subprocess.getstatusoutput('sudo pidof pigpiod')
            if status:  #  it wasn't running, so start it
-               self.LogError ("pigpiod was not running")
+               self.LogInfo ("pigpiod was not running")
                subprocess.getstatusoutput('sudo pigpiod')  # try to  start it
                time.sleep(0.5)
                # check it again        
@@ -291,7 +291,7 @@ class operateShutters(MyLog):
        
            try:
                pi = pigpio.pi()  # local GPIO only
-               self.LogError ("pigpio's pi instantiated")
+               self.LogInfo ("pigpio's pi instantiated")
            except Exception as e:
                start_pigpiod_exception = str(e)
                self.LogError ("problem instantiating pi: {}".format(start_pigpiod_exception))
