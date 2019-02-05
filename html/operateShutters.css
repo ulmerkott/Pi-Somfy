@@ -130,16 +130,47 @@ table.table td a.delete {
     color: #666666;
 }
 
-table.table td a.up {
+table td a.up {
     color: #666666;
+    -webkit-filter: drop-shadow(5px 5px 5px #bbb );
+    filter: drop-shadow(5px 5px 5px #bbb);
 }
 
-table.table td a.down {
+table td a.down {
     color: #666666;
+    -webkit-filter: drop-shadow(5px 5px 5px #bbb );
+    filter: drop-shadow(5px 5px 5px #bbb);
 }
 
-table.table td a.stop {
+table td a.stop {
     color: #666666;
+    -webkit-filter: drop-shadow(5px 5px 5px #bbb );
+    filter: drop-shadow(5px 5px 5px #bbb);
+}
+
+table td a.up:hover {
+    color: #666666;
+    position: relative;
+    top: -1px;
+}
+
+table td a.down:hover {
+    color: #666666;
+    position: relative;
+    top: -1px;
+}
+
+table td a.stop:hover {
+    color: #666666;
+    position: relative;
+    top: -1px;
+}
+
+.button_transparent {
+  opacity: 0.5;
+  filter: alpha(opacity=50); /* For IE8 and earlier */
+  position: relative;
+  top: 0px;
 }
 
 table.table td i {

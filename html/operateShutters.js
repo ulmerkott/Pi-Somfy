@@ -40,16 +40,16 @@ function GetStartupInfo(initMap)
                setupTableSchedule();
                if (config.Longitude == 0) {
                    $('.panel-collapse.in').collapse('toggle'); 
-                   $('#collapseOne').collapse('toggle');
+                   $('#collapseOne').collapse('show');
                } else if (Object.keys(config.Shutters).length == 0){
                    $('.panel-collapse.in').collapse('toggle'); 
-                   $('#collapseTwo').collapse('toggle');
+                   $('#collapseTwo').collapse('show');
                } else if (Object.keys(config.Schedule).length == 0) {
                    $('.panel-collapse.in').collapse('toggle'); 
-                   $('#collapseFour').collapse('toggle');
+                   $('#collapseThree').collapse('show');
                } else {
-                   $('.panel-collapse.in').collapse('toggle'); 
-                   $('#collapseThree').collapse('toggle');
+                   // $('.panel-collapse.in').collapse('toggle'); 
+                   // $('#collapseFour').collapse('show');
                }
                $(".loader").removeClass("is-active");
             });
@@ -287,8 +287,9 @@ function deleteSchedule(id) {
 
 function setupTableShutters () {
     $("#shutters").find("tr:gt(0)").remove();
-    $("#manual").find("tr:gt(0)").remove();
+    $("#action_manual").find(".lt").remove();
     
+    var c = 0;
     var shutterIds = Object.keys(config.Shutters);
     shutterIds.sort(function(a, b) { return config.Shutters[a].toLowerCase() > config.Shutters[b].toLowerCase()}).forEach(function(shutter) {
         var row = '<tr name="'+shutter+'" rowtype="existing">' +
@@ -297,13 +298,26 @@ function setupTableShutters () {
                   '</tr>';
         $("#shutters").append(row);
 
-        var row = '<tr name="'+shutter+'">' +
-                     '<td name="name">'+config.Shutters[shutter]+'</td>' +
-                     '<td class="td-action">' + $("#action_manual").html() + '</td>' +
-                  '</tr>';
-        $("#manual").append(row);
+        var cell = '<div class="lt lt-xs-x-'+(c%1)+' lt-xs-y-'+Math.floor(c/1)+' lt-xs-w-1 lt-xs-h-1 '+
+                               'lt-sm-x-'+(c%2)+' lt-sm-y-'+Math.floor(c/2)+' lt-sm-w-1 lt-sm-h-1 '+
+                               'lt-md-x-'+(c%3)+' lt-md-y-'+Math.floor(c/3)+' lt-md-w-1 lt-md-h-1 ' +
+                               'lt-lg-x-'+(c%4)+' lt-lg-y-'+Math.floor(c/4)+' lt-lg-w-1 lt-lg-h-1" '+
+                     ' draggable="false">'+
+                     '<div class="lt-body" name="'+shutter+'">' +
+                     '<table border="1" style="margin:20px;width:200px;border-color:#cccccc;font-size:20px;font-weight:bold;color:#888888;"><tr ><td style="padding:15px;margin:15px;" align="center">'+config.Shutters[shutter]+'<br>' +
+                        '<a class="up" title="Up" data-toggle="tooltip"><img src="up.png" width="60px"></a><br>' +
+                        '<a class="stop" title="Stop" data-toggle="tooltip"><img src="stop.png" width="60px"></a><br>' +
+                        '<a class="down" title="Down" data-toggle="tooltip"><img src="down.png" width="60px"></a>' +
+                     '</td></tr></table>' +
+                     '</div>' +
+                  '</div>';
+        $("#action_manual").append(cell);
+        c++;
     });
+    $("#action_manual").removeClass("lt-xs-h-16").removeClass("lt-sm-h-12").removeClass("lt-md-h-8").removeClass("lt-lg-h-6");
+    $("#action_manual").addClass("lt-xs-h-"+Math.floor(c/1)).addClass("lt-sm-h-"+Math.floor(c/2)).addClass("lt-md-h-"+Math.floor(c/3)).addClass("lt-lg-h-"+Math.floor(c/2));
     $("#shuttersCount").text($("#shutters").find('tr').length-1);
+    
 }
 
 function setupTableSchedule () {
@@ -750,22 +764,28 @@ function setupListeners() {
 
     // Shutter Commands
     $(document).on("click", ".up", function(){		
-        var key = $(this).parents("tr").attr('name');
-        var iconElement = $(this).find("i");
-        $(iconElement).toggleClass("glyphicon-arrow-up").toggleClass("glyphicon-refresh").addClass("gly-spin");
-        sendCommand(key, "up", function(){$(iconElement).toggleClass("glyphicon-arrow-up").toggleClass("glyphicon-refresh").removeClass("gly-spin")});
+        var key = $(this).parents("div").attr('name');
+        var iconElement = $(this).find("img");
+        // $(iconElement).toggleClass("glyphicon-triangle-top").toggleClass("glyphicon-refresh").addClass("gly-spin");
+        // sendCommand(key, "up", function(){$(iconElement).toggleClass("glyphicon-triangle-top").toggleClass("glyphicon-refresh").removeClass("gly-spin")});
+        $(iconElement).toggleClass("button_transparent");
+        sendCommand(key, "up", function(){$(iconElement).toggleClass("button_transparent")});
     });
     $(document).on("click", ".down", function(){		
-        var key = $(this).parents("tr").attr('name');
-        var iconElement = $(this).find("i");
-        $(iconElement).toggleClass("glyphicon-arrow-down").toggleClass("glyphicon-refresh").addClass("gly-spin");
-        sendCommand(key, "down", function(){$(iconElement).toggleClass("glyphicon-arrow-down").toggleClass("glyphicon-refresh").removeClass("gly-spin")});
+        var key = $(this).parents("div").attr('name');
+        var iconElement = $(this).find("img");
+        // $(iconElement).toggleClass("glyphicon-triangle-bottom").toggleClass("glyphicon-refresh").addClass("gly-spin");
+        // sendCommand(key, "down", function(){$(iconElement).toggleClass("glyphicon-triangle-bottom").toggleClass("glyphicon-refresh").removeClass("gly-spin")});
+        $(iconElement).toggleClass("button_transparent");
+        sendCommand(key, "down", function(){$(iconElement).toggleClass("button_transparent")});
     });
     $(document).on("click", ".stop", function(){		
-        var key = $(this).parents("tr").attr('name');
-        var iconElement = $(this).find("i");
-        $(iconElement).toggleClass("glyphicon-pause").toggleClass("glyphicon-refresh").addClass("gly-spin");
-        sendCommand(key, "stop", function(){$(iconElement).toggleClass("glyphicon-pause").toggleClass("glyphicon-refresh").removeClass("gly-spin")});
+        var key = $(this).parents("div").attr('name');
+        var iconElement = $(this).find("img");
+        // $(iconElement).toggleClass("glyphicon-minus").toggleClass("glyphicon-refresh").addClass("gly-spin");
+        // sendCommand(key, "stop", function(){$(iconElement).toggleClass("glyphicon-minus").toggleClass("glyphicon-refresh").removeClass("gly-spin")});
+        $(iconElement).toggleClass("button_transparent");
+        sendCommand(key, "stop", function(){$(iconElement).toggleClass("button_transparent")});
     });
 
 }

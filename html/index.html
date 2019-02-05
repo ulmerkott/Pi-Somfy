@@ -18,6 +18,7 @@
     <link rel="stylesheet" href="css/bootstrap-multiselect.css">
     <link rel="stylesheet" href="css/leaflet.css">
     <link rel="stylesheet" href="css/Control.Geocoder.css" />
+    <link rel="stylesheet" href="css/layout-grid.min.css" />
     <link rel="stylesheet" href="operateShutters.css">
     <script type="text/javascript" src="js/jquery-3.3.1.min.js"></script>
     <script type="text/javascript" src="js/bootstrap.min.js"></script>
@@ -29,6 +30,7 @@
     <script type="text/javascript" src="js/bootstrap-multiselect.js"></script>
     <script type="text/javascript" src="js/leaflet.js"></script>
     <script type="text/javascript" src="js/Control.Geocoder.js"></script>
+    <script type="text/javascript" src="js/layout-grid.min.js"></script>
     <script type="text/javascript" src="operateShutters.js"></script>
 
   </head>
@@ -94,40 +96,10 @@
                 <div class="panel panel-default">
                     <div class="panel-heading" data-toggle="collapse" data-parent="#accordion" href="#collapseThree">
                         <h4 class="panel-title">
-                            <span class="glyphicon glyphicon-sort"></span>Manual Operation
-                        </h4>
-                    </div>
-                    <div id="collapseThree" class="panel-collapse collapse">
-                        <div class="panel-body scroll">
-                             <div class="table-wrapper">
-                                 <table id="manual" class="table table-bordered">
-                                     <thead>
-                                         <tr>
-                                             <th>Shutter Name</th>
-                                             <th>Actions
-                                                <div id="action_manual" class="table-action">
-                          			    <a class="up" title="Up" data-toggle="tooltip"><i class="glyphicon glyphicon-arrow-up"></i></a>
-                                                    <a class="down" title="Down" data-toggle="tooltip"><i class="glyphicon glyphicon-arrow-down"></i></a>
-                                                    <a class="stop" title="Stop" data-toggle="tooltip"><i class="glyphicon glyphicon-pause"></i></a>
-                                                </div>
-                                             </th>
-                                         </tr>
-                                     </thead>
-                                     <tbody>
-                                     </tbody>
-                                 </table>
-                                 <br><br>
-                             </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="panel panel-default">
-                    <div class="panel-heading" data-toggle="collapse" data-parent="#accordion" href="#collapseFour">
-                        <h4 class="panel-title">
                             <span class="glyphicon glyphicon-play"></span>Scheduled Operation <span id="scheduleCount" class="badge"></span>
                         </h4>
                     </div>
-                    <div id="collapseFour" class="panel-collapse collapse in">
+                    <div id="collapseThree" class="panel-collapse collapse">
                         <div class="panel-body scroll">
                              <div class="table-wrapper">
                                  <div class="table-title">
@@ -271,6 +243,23 @@
                                      </tbody>
                                  </table>
                                  <br><br>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading" data-toggle="collapse" data-parent="#accordion" href="#collapseFour">
+                        <h4 class="panel-title">
+                            <span class="glyphicon glyphicon-sort"></span>Manual Operation
+                        </h4>
+                    </div>
+                    <div id="collapseFour" class="panel-collapse collapse in">
+                        <div class="panel-body scroll">
+                             <div class="table-wrapper" style="margin:0px;padding:0px">
+                                 <div class="container" style="width:90%;margin:20px;padding:0px">
+                                    <div id="action_manual" class="lt-container lt-xs-h-16 lt-sm-h-12 lt-md-h-8 lt-lg-h-6" data-arrange="lt-grid">
+                                    </div>
+                                 </div>
                              </div>
                         </div>
                     </div>
