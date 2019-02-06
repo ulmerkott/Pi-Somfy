@@ -78,6 +78,7 @@ class Alexa(threading.Thread, MyLog, debounce_handler):
 
     def run(self):
         self.LogInfo("Entering fauxmo polling loop")
+        error = 0
         while not self.shutdown_flag.is_set():
             # Loop and poll for incoming Echo requests
             try:
@@ -85,8 +86,12 @@ class Alexa(threading.Thread, MyLog, debounce_handler):
                 self.poller.poll(100)
                 time.sleep(0.01)
             except Exception as e:
-                self.LogError("Critical exception: "+ str(e.args))
-                break
+                error += 1
+                self.LogInfo("Critical exception n°" + str(error) + ": "+ str(e.args))
+                print("Trying not to shut down Alexa")
+#                if(error > 5):
+#                    self.LogError("Sixth critical error:" + str(e.args))
+#                    break
             
         self.LogError("Received Signal to shut down Alexa thread")
         return
