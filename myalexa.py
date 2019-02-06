@@ -89,6 +89,7 @@ class Alexa(threading.Thread, MyLog, debounce_handler):
                 error += 1
                 self.LogInfo("Critical exception n°" + str(error) + ": "+ str(e.args))
                 print("Trying not to shut down Alexa")
+                time.sleep(0.5) #Wait half a second when an exception occurs
 #                if(error > 5):
 #                    self.LogError("Sixth critical error:" + str(e.args))
 #                    break
