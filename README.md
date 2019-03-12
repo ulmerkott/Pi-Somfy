@@ -2,7 +2,7 @@
 
 ## 1 Overview
 
-This project allows to operate multiple Somfy Shutters with a Raspberry Pi with cheap hardware costing less than $2. It comes with a command line interface, a web interface and an Amazon Alexa interface. 
+This project allows to operate multiple Somfy shutters using the **RTS protocol** from a Raspberry Pi with cheap hardware costing less than $2. It comes with a command line interface, a web interface and an Amazon Alexa interface. 
 
 ## 2 Hardware
 
