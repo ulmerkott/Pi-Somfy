@@ -19,9 +19,20 @@ function resizeDiv() {
     vpw = $(window).width();
     vph = $(window).height();
     $('#accordion').css({'height': vph-30 + 'px'});
+    // $('#accordion').css({'width': vpw + 'px'});
     $('.panel-body').css({'height': vph-215 + 'px'});
     $('.table-wrapper').css({'height': vph-215 + 'px'});
     $('#mymap').css({'height': vph-300 + 'px'});
+    /*if (vpw<465) {
+       $("#action_manual").css({'width': 310 + 'px'});
+       $("html").css({'width': '465px'});
+       $("body").css({'overflow-x': 'scroll'});
+    } else {
+       $("#action_manual").css({'width': '100%'});     
+       $("html").css({'width':  vpw + 'px'});
+       $("body").css({'overflow-x': 'hidden'});
+    }
+    */
 }
 
 function GetStartupInfo(initMap)
@@ -296,7 +307,7 @@ function setupTableShutters () {
                   '</tr>';
         $("#shutters").append(row);
 
-        var cell = '<div class="shutterAction" name="'+shutter+'">' + 
+        var cell = '<div class="shutterRemote" name="'+shutter+'">' + 
 						'<div class="name">'+config.Shutters[shutter]+'</div>' +
                         '<a class="up btn" title="Up" data-toggle="tooltip" role="button"><img src="up.png"></a>' +
                         '<a class="stop btn" title="Stop" data-toggle="tooltip" role="button"><img src="stop.png"></a>' +
