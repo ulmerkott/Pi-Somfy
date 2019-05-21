@@ -18,21 +18,10 @@ window.onresize = function(event) {
 function resizeDiv() {
     vpw = $(window).width();
     vph = $(window).height();
-    $('#accordion').css({'height': vph + 'px'});
-    // $('#accordion').css({'width': vpw + 'px'});
-    $('.panel-body').css({'height': vph-315 + 'px'});
-    $('.table-wrapper').css({'height': vph-315 + 'px'});
-    $('#mymap').css({'height': vph-400 + 'px'});
-    if (vpw<465) {
-       $("#action_manual").css({'width': 310 + 'px'});
-       $("html").css({'width': '465px'});
-       $("body").css({'overflow-x': 'scroll'});
-    } else {
-       $("#action_manual").css({'width': '100%'});     
-       $("html").css({'width':  vpw + 'px'});
-       $("body").css({'overflow-x': 'hidden'});
-    }
-    
+    $('#accordion').css({'height': vph-30 + 'px'});
+    $('.panel-body').css({'height': vph-215 + 'px'});
+    $('.table-wrapper').css({'height': vph-215 + 'px'});
+    $('#mymap').css({'height': vph-300 + 'px'});
 }
 
 function GetStartupInfo(initMap)
@@ -308,7 +297,7 @@ function setupTableShutters () {
         $("#shutters").append(row);
 
         var cell = '<div class="shutterAction" name="'+shutter+'">' + 
-						'<span class="label">'+config.Shutters[shutter]+'</span><br>' +
+						'<div class="name">'+config.Shutters[shutter]+'</div>' +
                         '<a class="up btn" title="Up" data-toggle="tooltip" role="button"><img src="up.png"></a>' +
                         '<a class="stop btn" title="Stop" data-toggle="tooltip" role="button"><img src="stop.png"></a>' +
                         '<a class="down btn" title="Down" data-toggle="tooltip" role="button"><img src="down.png"></a>' +
