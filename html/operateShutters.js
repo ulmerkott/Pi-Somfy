@@ -3,7 +3,7 @@ var baseurl = pathname.concat("cmd/");
 var mymap;
 var marker;
 var config;
-var modalCallerIconElement
+var modalCallerIconElement;
 
 GetStartupInfo(true);
 $(document).ready(function() {
@@ -16,23 +16,8 @@ window.onresize = function(event) {
 }
 
 function resizeDiv() {
-    vpw = $(window).width();
     vph = $(window).height();
-    $('#accordion').css({'height': vph + 'px'});
-    // $('#accordion').css({'width': vpw + 'px'});
-    $('.panel-body').css({'height': vph-315 + 'px'});
-    $('.table-wrapper').css({'height': vph-315 + 'px'});
-    $('#mymap').css({'height': vph-400 + 'px'});
-    if (vpw<465) {
-       $("#action_manual").css({'width': 310 + 'px'});
-       $("html").css({'width': '465px'});
-       $("body").css({'overflow-x': 'scroll'});
-    } else {
-       $("#action_manual").css({'width': '100%'});     
-       $("html").css({'width':  vpw + 'px'});
-       $("body").css({'overflow-x': 'hidden'});
-    }
-    
+    $('#mymap').css({'height': vph*0.5 + 'px'});
 }
 
 function GetStartupInfo(initMap)
@@ -49,7 +34,6 @@ function GetStartupInfo(initMap)
                setupTableShutters();
                setupTableSchedule();
                if (config.Longitude == 0) {
-                   $('.panel-collapse.in').collapse('toggle'); 
                    $('#collapseOne').collapse('show');
                } else if (Object.keys(config.Shutters).length == 0){
                    $('.panel-collapse.in').collapse('toggle'); 
@@ -57,9 +41,6 @@ function GetStartupInfo(initMap)
                } else if (Object.keys(config.Schedule).length == 0) {
                    $('.panel-collapse.in').collapse('toggle'); 
                    $('#collapseThree').collapse('show');
-               } else {
-                   // $('.panel-collapse.in').collapse('toggle'); 
-                   // $('#collapseFour').collapse('show');
                }
                $(".loader").removeClass("is-active");
             });
@@ -297,7 +278,6 @@ function deleteSchedule(id) {
 
 function setupTableShutters () {
     $("#shutters").find("tr:gt(0)").remove();
-    $("#action_manual").find(".lt").remove();
     
     var c = 0;
     var shutterIds = Object.keys(config.Shutters);
@@ -308,26 +288,18 @@ function setupTableShutters () {
                   '</tr>';
         $("#shutters").append(row);
 
-        var cell = '<div class="lt lt-xs-x-'+(c%1)+' lt-xs-y-'+Math.floor(c/1)+' lt-xs-w-1 lt-xs-h-1 '+
-                               'lt-sm-x-'+(c%2)+' lt-sm-y-'+Math.floor(c/2)+' lt-sm-w-1 lt-sm-h-1 '+
-                               'lt-md-x-'+(c%3)+' lt-md-y-'+Math.floor(c/3)+' lt-md-w-1 lt-md-h-1 ' +
-                               'lt-lg-x-'+(c%4)+' lt-lg-y-'+Math.floor(c/4)+' lt-lg-w-1 lt-lg-h-1" '+
-                     ' draggable="true">'+
-                     '<div class="lt-body" name="'+shutter+'">' +
-                     '<table border="1" style="margin:20px;width:200px;border-color:#cccccc;font-size:20px;font-weight:bold;color:#888888;"><tr ><td style="padding:15px;margin:15px;" align="center">'+config.Shutters[shutter]+'<br>' +
-                        '<a class="up" title="Up" data-toggle="tooltip"><img src="up.png" width="60px"></a><br>' +
-                        '<a class="stop" title="Stop" data-toggle="tooltip"><img src="stop.png" width="60px"></a><br>' +
-                        '<a class="down" title="Down" data-toggle="tooltip"><img src="down.png" width="60px"></a>' +
-                     '</td></tr></table>' +
-                     '</div>' +
+        var cell = '<div class="shutterRemote" name="'+shutter+'">' + 
+						'<div class="name">'+config.Shutters[shutter]+'</div>' +
+                        '<a class="up btn" title="Up" data-toggle="tooltip" role="button"><img src="up.png"></a>' +
+                        '<a class="stop btn" title="Stop" data-toggle="tooltip" role="button"><img src="stop.png"></a>' +
+                        '<a class="down btn" title="Down" data-toggle="tooltip" role="button"><img src="down.png"></a>' +
                   '</div>';
         $("#action_manual").append(cell);
         c++;
     });
-    $("#action_manual").removeClass("lt-xs-h-16").removeClass("lt-sm-h-12").removeClass("lt-md-h-8").removeClass("lt-lg-h-6");
-    $("#action_manual").addClass("lt-xs-h-"+c).addClass("lt-sm-h-"+Math.floor(c/2)).addClass("lt-md-h-"+Math.floor(c/3)).addClass("lt-lg-h-"+Math.floor(c/4));
+	
     $("#shuttersCount").text($("#shutters").find('tr').length-1);
-    
+	
 }
 
 function setupTableSchedule () {
