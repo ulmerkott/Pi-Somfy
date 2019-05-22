@@ -1,7 +1,6 @@
 body {
     margin-top: 15px;
     margin-bottom: 15px;
-    overflow:hidden;
 }
 
 .panel-title .glyphicon { 
@@ -17,7 +16,6 @@ body {
 .panel-body.scroll {
     margin: 0px !important;
     padding: 0px !important;
-    overflow: hidden !important;
 }
 
 .panel-body.nonscroll {

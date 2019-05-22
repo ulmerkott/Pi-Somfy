@@ -3,7 +3,7 @@ var baseurl = pathname.concat("cmd/");
 var mymap;
 var marker;
 var config;
-var modalCallerIconElement
+var modalCallerIconElement;
 
 GetStartupInfo(true);
 $(document).ready(function() {
@@ -16,23 +16,8 @@ window.onresize = function(event) {
 }
 
 function resizeDiv() {
-    vpw = $(window).width();
     vph = $(window).height();
-    $('#accordion').css({'height': vph-30 + 'px'});
-    // $('#accordion').css({'width': vpw + 'px'});
-    $('.panel-body').css({'height': vph-215 + 'px'});
-    $('.table-wrapper').css({'height': vph-215 + 'px'});
-    $('#mymap').css({'height': vph-300 + 'px'});
-    /*if (vpw<465) {
-       $("#action_manual").css({'width': 310 + 'px'});
-       $("html").css({'width': '465px'});
-       $("body").css({'overflow-x': 'scroll'});
-    } else {
-       $("#action_manual").css({'width': '100%'});     
-       $("html").css({'width':  vpw + 'px'});
-       $("body").css({'overflow-x': 'hidden'});
-    }
-    */
+    $('#mymap').css({'height': vph*0.5 + 'px'});
 }
 
 function GetStartupInfo(initMap)
@@ -49,7 +34,6 @@ function GetStartupInfo(initMap)
                setupTableShutters();
                setupTableSchedule();
                if (config.Longitude == 0) {
-                   $('.panel-collapse.in').collapse('toggle'); 
                    $('#collapseOne').collapse('show');
                } else if (Object.keys(config.Shutters).length == 0){
                    $('.panel-collapse.in').collapse('toggle'); 
@@ -58,8 +42,11 @@ function GetStartupInfo(initMap)
                    $('.panel-collapse.in').collapse('toggle'); 
                    $('#collapseThree').collapse('show');
                } else {
-                   // $('.panel-collapse.in').collapse('toggle'); 
-                   // $('#collapseFour').collapse('show');
+				   // If everything is configured, hide the "config" panels 
+				   // on small screens (phones) to keep only the manual operation
+				   $('#collapseOne').parent().addClass("hidden-xs");
+				   $('#collapseTwo').parent().addClass("hidden-xs");
+				   $('#collapseThree').parent().addClass("hidden-xs");
                }
                $(".loader").removeClass("is-active");
             });
