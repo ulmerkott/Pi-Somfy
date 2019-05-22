@@ -3,6 +3,11 @@ body {
     margin-bottom: 15px;
 }
 
+.panel-heading {
+	position: sticky;
+	top: 0px;
+}
+
 .panel-title .glyphicon { 
     margin-right:20px; 
 }

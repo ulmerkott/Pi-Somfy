@@ -41,12 +41,6 @@ function GetStartupInfo(initMap)
                } else if (Object.keys(config.Schedule).length == 0) {
                    $('.panel-collapse.in').collapse('toggle'); 
                    $('#collapseThree').collapse('show');
-               } else {
-				   // If everything is configured, hide the "config" panels 
-				   // on small screens (phones) to keep only the manual operation
-				   $('#collapseOne').parent().addClass("hidden-xs");
-				   $('#collapseTwo').parent().addClass("hidden-xs");
-				   $('#collapseThree').parent().addClass("hidden-xs");
                }
                $(".loader").removeClass("is-active");
             });
