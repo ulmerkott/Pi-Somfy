@@ -20,7 +20,7 @@ Once you have all the hardware handy, it's now time to swap the oscillator, whic
 1. While pulling the oscillator from the front, heat up the 3 soldering point on the back with the soldering iron until the oscillator is detached from the board
 1. Clean up the remaining solder mess on bith desoldering braid or a desoldering pump
 1. Now put in the new oscillator (make sure all 3 pins connect through the print) and solder it in again
-1. Solder an antenna to the ANT pad. The ideal is a 17 cm solid core wire but almost anything will do the job
+1. Solder an antenna to the ANT pad. The ideal is a 17 cm solid core wire but almost anything will do the job. I used the following [Order] (https://www.ebay.com/itm/10pcs-433MHz-antenna-Helical-antenna-Remote-Control-for-Arduino-Raspberry-pi/372691762881?hash=item56c628fec1:g:kf0AAOxyBPZTgvGe) as I like the outlook, but really anything will do. If your Pi is less than 10 ft from the recevier, it may work without antenna.
 
 And you are done on the mods!
 
