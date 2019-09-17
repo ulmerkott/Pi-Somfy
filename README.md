@@ -101,20 +101,20 @@ You have 4 ways to operate. The recommended operation mode is mode 4. But the ot
 
 **Arguments:**
 
-    shutterName                             Name of the Shutter
-    -h, --help                              show this help message and exit
-    -config CONFIGFILE, -c CONFIGFILE       Name of the Config File (incl full Path)
-    -up, -u                                 Raise the Shutter
-    -down, -d                               lower the Shutter
-    -stop, -s                               stop the Shutter
-    -program, -p                            send a program signal
-    -demo                                   lower the Shutter, Stop after 7 second, then raise the Shutter
+    shutterName                             Name of the shutter
+    -h, --help                              Show this help message and exit
+    -c CONFIGFILE, --config CONFIGFILE      Name of the config File (incl full Path)
+    -up, -u                                 Raise the shutter
+    -down, -d                               lower the shutter
+    -stop, -s                               Stop the shutter
+    -program, -p                            Send a program signal
+    -demo                                   lower the shutter, stop after 7 second then raise the shutter
     -duskdawn DUSKDAWN DUSKDAWN, -dd DUSKDAWN DUSKDAWN
-                                          Automatically lower the shutter at sunset and rise the
-                                          shutter at sunrise, provide the evening delay and
-                                          morning delay in minutes each
-    -auto, -a                               Run schedule based on config. Also will start up the web-server which can be used to setup the schedule.
-
+                                            Automatically lower the shutter at sunset and rise the
+                                            shutter at sunrise, provide the evening delay and
+                                            morning delay in minutes each
+    -auto, -a                               Run schedule based on config. Also will start up the web-server 
+                                            which can be used to setup the schedule.
     -echo, -e                               Enable Amazon Alexa (Echo) integration
 
 
