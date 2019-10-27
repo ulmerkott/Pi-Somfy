@@ -116,6 +116,7 @@ You have 4 ways to operate. The recommended operation mode is mode 4. But the ot
     -auto, -a                               Run schedule based on config. Also will start up the web-server 
                                             which can be used to setup the schedule.
     -echo, -e                               Enable Amazon Alexa (Echo) integration
+    -mqtt, -m                               Enable MQTT integration
 
 
 **Examples:**
