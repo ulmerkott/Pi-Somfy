@@ -38,9 +38,6 @@ function GetStartupInfo(initMap)
                } else if (Object.keys(config.Shutters).length == 0){
                    $('.panel-collapse.in').collapse('toggle'); 
                    $('#collapseTwo').collapse('show');
-               } else if (Object.keys(config.Schedule).length == 0) {
-                   $('.panel-collapse.in').collapse('toggle'); 
-                   $('#collapseThree').collapse('show');
                }
                $(".loader").removeClass("is-active");
             });
