@@ -74,7 +74,8 @@
                                  <table id="shutters" class="table table-bordered">
                                      <thead>
                                          <tr>
-                                             <th>Shutter Name</th>
+                                             <th width="55%">Shutter Name</th>
+                                             <th width="20%">Operation Time (Seconds)</th>
                                              <th>Actions
                                                 <div id="action_shutters" class="table-action">
                           			    <a class="save saveShutters" title="Add" data-toggle="tooltip"><i class="glyphicon glyphicon-floppy-save"></i></a>
@@ -88,7 +89,6 @@
                                      <tbody>
                                      </tbody>
                                  </table>
-                                 <br><br>
                              </div>
                         </div>
                     </div>
@@ -188,36 +188,17 @@
                                                                 <div style="display:inline-block; font-size:10px; vertical-align:top;">Partial Operation:<br>
                                                                        <select id="duration" class="durationList" style="margin-left:0px; padding-left:0px">
                                                                           <option value="0">Full</option>
-                                                                          <option value="1">1 sec</option>
-                                                                          <option value="2">2 sec</option>
-                                                                          <option value="3">3 sec</option>
-                                                                          <option value="4">4 sec</option>
-                                                                          <option value="5">5 sec</option>
-                                                                          <option value="6">6 sec</option>
-                                                                          <option value="7">7 sec</option>
-                                                                          <option value="8">8 sec</option>
-                                                                          <option value="9">9 sec</option>
-                                                                          <option value="10">10 sec</option>
-                                                                          <option value="11">11 sec</option>
-                                                                          <option value="12">12 sec</option>
-                                                                          <option value="13">13 sec</option>
-                                                                          <option value="14">14 sec</option>
-                                                                          <option value="15">15 sec</option>
-                                                                          <option value="16">16 sec</option>
-                                                                          <option value="17">17 sec</option>
-                                                                          <option value="18">18 sec</option>
-                                                                          <option value="19">19 sec</option>
-                                                                          <option value="20">20 sec</option>
-                                                                          <option value="21">21 sec</option>
-                                                                          <option value="22">22 sec</option>
-                                                                          <option value="23">23 sec</option>
-                                                                          <option value="24">24 sec</option>
-                                                                          <option value="25">25 sec</option>
-                                                                          <option value="26">26 sec</option>
-                                                                          <option value="27">27 sec</option>
-                                                                          <option value="28">28 sec</option>
-                                                                          <option value="29">29 sec</option>
-                                                                          <option value="30">30 sec</option>
+                                                                          <option value="10">10%</option>
+                                                                          <option value="20">20%</option>
+                                                                          <option value="25">25%</option>
+                                                                          <option value="30">30%</option>
+                                                                          <option value="40">40%</option>
+                                                                          <option value="50">50%</option>
+                                                                          <option value="60">60%</option>
+                                                                          <option value="70">70%</option>
+                                                                          <option value="75">75%</option>
+                                                                          <option value="80">80%</option>
+                                                                          <option value="90">90%</option>
                                                                        </select>
                                                                 </div>
                                                                 <div style="display:inline-block; font-size:10px; vertical-align: top;">Shutters to Operate:<br>
@@ -242,7 +223,6 @@
                                      <tbody>
                                      </tbody>
                                  </table>
-                                 <br><br>
                              </div>
                         </div>
                     </div>
@@ -255,12 +235,10 @@
                     </div>
                     <div id="collapseFour" class="panel-collapse collapse in">
                         <div class="panel-body scroll">
-                             <div class="table-wrapper" style="margin:0px;padding:0px">
-                                 <div class="container" style="width:90%;margin:20px;padding:0px">
-                                    <div id="action_manual" class="lt-container lt-xs-h-16 lt-sm-h-12 lt-md-h-8 lt-lg-h-6" data-arrange="lt-grid">
-                                    </div>
-                                 </div>
-                             </div>
+                            <div class="table-wrapper">
+								<div id="action_manual">
+								</div>
+							</div>
                         </div>
                     </div>
                 </div>

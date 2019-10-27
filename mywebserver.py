@@ -49,6 +49,13 @@ class FlaskAppWrapper(MyLog):
         self.add_endpoint(endpoint='/shutdown', endpoint_name='shutdown', handler=self.shutdown_server)
         self.add_endpoint(endpoint='/cmd/<command>', endpoint_name='cmd', handler=self.processCommand, methods=['GET', 'POST'])
         
+    def isfloat(self, value):
+        try:
+            float(value)
+            return True
+        except ValueError:
+            return False
+        
     def add_header(self, r):
         r.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, public, max-age=0"
         r.headers["Pragma"] = "no-cache"
@@ -131,13 +138,18 @@ class FlaskAppWrapper(MyLog):
             import unicodedata
             name = params.get('name', 0, type=unicode)
             name = unicodedata.normalize('NFKD', name).encode('ascii','ignore')
+            duration = params.get('duration', 0, type=unicode)
+            duration = unicodedata.normalize('NFKD', duration).encode('ascii','ignore')
         else: 
             name = params.get('name', 0, type=str)
+            duration = params.get('duration', 0, type=str)
         self.LogDebug("add shutter: "+ name)
         if (name in self.config.ShuttersByName):
             return {'status': 'ERROR', 'message': 'Name is not unique'}
         elif ("," in name):
             return {'status': 'ERROR', 'message': 'New name can not contain SPACES or COMMAS'}
+        elif not self.isfloat(duration):
+            return {'status': 'ERROR', 'message': 'seconds must be a number (may contain decimals)'}
         else:
             tmp_id = int(self.config.RTS_Address, 16)
             conflict = True
@@ -150,10 +162,10 @@ class FlaskAppWrapper(MyLog):
             id = "0x%0.2X" % tmp_id
             code = 1
             self.LogDebug("got a new shutter id: "+id)
-            self.config.WriteValue(str(id), str(name)+",True", section="Shutters");
+            self.config.WriteValue(str(id), str(name)+",True,"+str(duration), section="Shutters");
             self.config.WriteValue(str(id), str(code), section="ShutterRollingCodes");
             self.config.ShuttersByName[name] = id
-            self.config.Shutters[id] = {'name': name, 'code': code}
+            self.config.Shutters[id] = {'name': name, 'code': code, 'duration': duration}
             return {'status': 'OK', 'id': id}
 
     def editShutter(self, params):
@@ -162,22 +174,28 @@ class FlaskAppWrapper(MyLog):
             import unicodedata
             name = params.get('name', 0, type=unicode)
             name = unicodedata.normalize('NFKD', name).encode('ascii','ignore')
+            duration = params.get('duration', 0, type=unicode)
+            duration = unicodedata.normalize('NFKD', duration).encode('ascii','ignore')
         else:
             name = params.get('name', 0, type=str)
+            duration = params.get('duration', 0, type=str)
         self.LogDebug("edit shutter: "+id+" / "+name)
         if (not id in self.config.Shutters):
             return {'status': 'ERROR', 'message': 'Shutter does not exist'}
-        elif (name == self.config.Shutters[id]['name']):
-            return {'status': 'ERROR', 'message': 'Name has not changed, remaining the same.'}
-        elif (name in self.config.ShuttersByName):
+        elif ((name == self.config.Shutters[id]['name']) and (duration == self.config.Shutters[id]['duration'])):
+            return {'status': 'ERROR', 'message': 'Neither Name nor Duration has not changed, remaining the same.'}
+        elif ((name != self.config.Shutters[id]['name']) and (name in self.config.ShuttersByName)):
             return {'status': 'ERROR', 'message': 'Name is not unique'}
         elif ("," in name):
             return {'status': 'ERROR', 'message': 'New name can not contain COMMAS'}
+        elif not self.isfloat(duration):
+            return {'status': 'ERROR', 'message': 'seconds must be a number (may contain decimals)'}
         else:
-            self.config.WriteValue(str(id), str(name)+",True", section="Shutters");
+            self.config.WriteValue(str(id), str(name)+",True,"+str(duration), section="Shutters");
             self.config.ShuttersByName.pop(self.config.Shutters[id]['name'], None)
             self.config.ShuttersByName['name'] = id
             self.config.Shutters[id]['name'] = name
+            self.config.Shutters[id]['duration'] = duration
             return {'status': 'OK'}
 
     def deleteShutter(self, params):
@@ -186,7 +204,7 @@ class FlaskAppWrapper(MyLog):
         if (not id in self.config.Shutters):
             return {'status': 'ERROR', 'message': 'Shutter does not exist'}
         else:
-            self.config.WriteValue(str(id), self.config.Shutters[id]['name']+",False", section="Shutters");
+            self.config.WriteValue(str(id), self.config.Shutters[id]['name']+",False,"+self.config.Shutters[id]['duration'], section="Shutters");
             self.config.ShuttersByName.pop(self.config.Shutters[id]['name'], None)
             self.config.Shutters.pop(id, None)
             return {'status': 'OK'}
@@ -207,9 +225,11 @@ class FlaskAppWrapper(MyLog):
 
     def getConfig(self, params):
         shutters = {}
+        durations = {}
         for k in self.config.Shutters:
             shutters[k] = self.config.Shutters[k]['name']  
-        obj = {'Latitude': self.config.Latitude, 'Longitude': self.config.Longitude, 'Shutters': shutters, 'Schedule': self.schedule.getScheduleAsDict()}
+            durations[k] = self.config.Shutters[k]['duration']            
+        obj = {'Latitude': self.config.Latitude, 'Longitude': self.config.Longitude, 'Shutters': shutters, 'ShutterDurations': durations, 'Schedule': self.schedule.getScheduleAsDict()}
         self.LogDebug("getConfig called, sending: "+json.dumps(obj))
         return obj
 

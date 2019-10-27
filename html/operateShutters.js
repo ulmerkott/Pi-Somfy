@@ -3,7 +3,7 @@ var baseurl = pathname.concat("cmd/");
 var mymap;
 var marker;
 var config;
-var modalCallerIconElement
+var modalCallerIconElement;
 
 GetStartupInfo(true);
 $(document).ready(function() {
@@ -16,23 +16,8 @@ window.onresize = function(event) {
 }
 
 function resizeDiv() {
-    vpw = $(window).width();
     vph = $(window).height();
-    $('#accordion').css({'height': vph + 'px'});
-    // $('#accordion').css({'width': vpw + 'px'});
-    $('.panel-body').css({'height': vph-315 + 'px'});
-    $('.table-wrapper').css({'height': vph-315 + 'px'});
-    $('#mymap').css({'height': vph-400 + 'px'});
-    if (vpw<465) {
-       $("#action_manual").css({'width': 310 + 'px'});
-       $("html").css({'width': '465px'});
-       $("body").css({'overflow-x': 'scroll'});
-    } else {
-       $("#action_manual").css({'width': '100%'});     
-       $("html").css({'width':  vpw + 'px'});
-       $("body").css({'overflow-x': 'hidden'});
-    }
-    
+    $('#mymap').css({'height': vph*0.5 + 'px'});
 }
 
 function GetStartupInfo(initMap)
@@ -49,7 +34,6 @@ function GetStartupInfo(initMap)
                setupTableShutters();
                setupTableSchedule();
                if (config.Longitude == 0) {
-                   $('.panel-collapse.in').collapse('toggle'); 
                    $('#collapseOne').collapse('show');
                } else if (Object.keys(config.Shutters).length == 0){
                    $('.panel-collapse.in').collapse('toggle'); 
@@ -57,9 +41,6 @@ function GetStartupInfo(initMap)
                } else if (Object.keys(config.Schedule).length == 0) {
                    $('.panel-collapse.in').collapse('toggle'); 
                    $('#collapseThree').collapse('show');
-               } else {
-                   // $('.panel-collapse.in').collapse('toggle'); 
-                   // $('#collapseFour').collapse('show');
                }
                $(".loader").removeClass("is-active");
             });
@@ -143,15 +124,15 @@ function prettyPrintSchedule(evt, shutters) {
 
    if (evt['shutterAction'].substring(0, 2) == "up") {
       outstr += "rise ";
-      time = parseInt(evt['shutterAction'].substring(2));
-      if (time > 0) {
-         outstr += "for "+time+" seconds "
+      percentage = parseInt(evt['shutterAction'].substring(2));
+      if (percentage > 0) {
+         outstr += "for "+percentage+"% "
       } 
    } else if (evt['shutterAction'].substring(0, 4) == "down") {
       outstr += "lower ";
-      time = parseInt(evt['shutterAction'].substring(4));
-      if (time > 0) {
-         outstr += "for "+time+" seconds "
+      percentage = parseInt(evt['shutterAction'].substring(4));
+      if (percentage > 0) {
+         outstr += "for "+percentage+"% "
       } 
    }
 
@@ -190,10 +171,10 @@ function sendCommand(shutter, command, resetIcon) {
                }, "json");
 }
 
-function addShutter(temp_id, name) {
+function addShutter(temp_id, name, duration) {
     var url = baseurl.concat("addShutter");
       $.post(  url,
-               {name: name},
+               {name: name, duration: duration},
                function(result, status){
                    if ((status=="success") && (result.status == "OK")) {
                       $("#shutters tbody tr:last-child").attr('name', result.id);
@@ -207,10 +188,10 @@ function addShutter(temp_id, name) {
                }, "json");
 }
 
-function editShutter(id, name, resetIcon) {
+function editShutter(id, name, duration, resetIcon) {
     var url = baseurl.concat("editShutter");
       $.post(  url,
-               {id: id, name: name},
+               {id: id, name: name, duration: duration},
                function(result, status){
                    resetIcon();
                    if ((status=="success") && (result.status == "OK")) {
@@ -297,37 +278,29 @@ function deleteSchedule(id) {
 
 function setupTableShutters () {
     $("#shutters").find("tr:gt(0)").remove();
-    $("#action_manual").find(".lt").remove();
     
     var c = 0;
     var shutterIds = Object.keys(config.Shutters);
     shutterIds.sort(function(a, b) { return config.Shutters[a].toLowerCase() > config.Shutters[b].toLowerCase()}).forEach(function(shutter) {
         var row = '<tr name="'+shutter+'" rowtype="existing">' +
                      '<td name="name">'+config.Shutters[shutter]+'</td>' +
+                     '<td name="duration">'+config.ShutterDurations[shutter]+'</td>' +
                      '<td class="td-action">' + $("#action_shutters").html() + '</td>' +
                   '</tr>';
         $("#shutters").append(row);
 
-        var cell = '<div class="lt lt-xs-x-'+(c%1)+' lt-xs-y-'+Math.floor(c/1)+' lt-xs-w-1 lt-xs-h-1 '+
-                               'lt-sm-x-'+(c%2)+' lt-sm-y-'+Math.floor(c/2)+' lt-sm-w-1 lt-sm-h-1 '+
-                               'lt-md-x-'+(c%3)+' lt-md-y-'+Math.floor(c/3)+' lt-md-w-1 lt-md-h-1 ' +
-                               'lt-lg-x-'+(c%4)+' lt-lg-y-'+Math.floor(c/4)+' lt-lg-w-1 lt-lg-h-1" '+
-                     ' draggable="true">'+
-                     '<div class="lt-body" name="'+shutter+'">' +
-                     '<table border="1" style="margin:20px;width:200px;border-color:#cccccc;font-size:20px;font-weight:bold;color:#888888;"><tr ><td style="padding:15px;margin:15px;" align="center">'+config.Shutters[shutter]+'<br>' +
-                        '<a class="up" title="Up" data-toggle="tooltip"><img src="up.png" width="60px"></a><br>' +
-                        '<a class="stop" title="Stop" data-toggle="tooltip"><img src="stop.png" width="60px"></a><br>' +
-                        '<a class="down" title="Down" data-toggle="tooltip"><img src="down.png" width="60px"></a>' +
-                     '</td></tr></table>' +
-                     '</div>' +
+        var cell = '<div class="shutterRemote" name="'+shutter+'">' + 
+						'<div class="name">'+config.Shutters[shutter]+'</div>' +
+                        '<a class="up btn" title="Up" data-toggle="tooltip" role="button"><img src="up.png"></a>' +
+                        '<a class="stop btn" title="Stop" data-toggle="tooltip" role="button"><img src="stop.png"></a>' +
+                        '<a class="down btn" title="Down" data-toggle="tooltip" role="button"><img src="down.png"></a>' +
                   '</div>';
         $("#action_manual").append(cell);
         c++;
     });
-    $("#action_manual").removeClass("lt-xs-h-16").removeClass("lt-sm-h-12").removeClass("lt-md-h-8").removeClass("lt-lg-h-6");
-    $("#action_manual").addClass("lt-xs-h-"+c).addClass("lt-sm-h-"+Math.floor(c/2)).addClass("lt-md-h-"+Math.floor(c/3)).addClass("lt-lg-h-"+Math.floor(c/4));
+	
     $("#shuttersCount").text($("#shutters").find('tr').length-1);
-    
+	
 }
 
 function setupTableSchedule () {
@@ -386,18 +359,26 @@ function setupTableSchedule () {
         if (evt['shutterAction'].substring(0, 2) == "up") {
            thisRow.find('#scheduleEdit .shutterActionUp').removeClass("inactiveDirection");
            thisRow.find('#scheduleEdit .shutterActionDown').addClass("inactiveDirection");
-           time = parseInt(evt['shutterAction'].substring(2));
-           if (time > 0) {
-              thisRow.find('.durationList').val(time)
+           percentage = parseInt(evt['shutterAction'].substring(2));
+           if (percentage > 0) {
+              if (percentage < 10) {percentage = 10}         // Backward compatibility where the time value was in seconds rather than in percentage
+              else if (percentage < 20) {percentage = 20}
+              else if (percentage < 25) {percentage = 25}
+              else if (percentage < 30) {percentage = 30}
+              thisRow.find('.durationList').val(percentage)
            } else {
               thisRow.find('.durationList').val(0)           
            }
         } else if (evt['shutterAction'].substring(0, 4) == "down") {
            thisRow.find('#scheduleEdit .shutterActionDown').removeClass("inactiveDirection");
            thisRow.find('#scheduleEdit .shutterActionUp').addClass("inactiveDirection");
-           time = parseInt(evt['shutterAction'].substring(4));
-           if (time > 0) {
-              thisRow.find('.durationList').val(time)
+           percentage = parseInt(evt['shutterAction'].substring(4));
+           if (percentage > 0) {
+              if (percentage < 10) {percentage = 10}         // Backward compatibility where the time value was in seconds rather than in percentage
+              else if (percentage < 20) {percentage = 20}
+              else if (percentage < 25) {percentage = 25}
+              else if (percentage < 30) {percentage = 30}
+              thisRow.find('.durationList').val(percentage)
            } else {
               thisRow.find('.durationList').val(0)           
            }
@@ -451,6 +432,7 @@ function setupListeners() {
         var index = $("#shutters tbody tr:last-child").index();
         var row = '<tr name="newkey_'+index+'" rowtype="new">' +
                       '<td name="name"><input type="text" class="form-control"></td>' +
+                      '<td name="duration"><input type="text" class="form-control"></td>' +
    		      '<td class="td-action">' + $("#action_shutters").html() + '</td>' +
                   '</tr>';
     	$("#shutters").append(row);		
@@ -526,11 +508,11 @@ function setupListeners() {
            if (mytype == "ADD") {
               modalCallerIconElement = $(this).find("i");
               $(modalCallerIconElement).toggleClass("glyphicon-floppy-save").toggleClass("glyphicon-refresh").addClass("gly-spin");
-              addShutter(mydata.id, mydata.name);
+              addShutter(mydata.id, mydata.name, mydata.duration);
            } else if (mytype == "AMEND") { 
               var iconElement = $(this).find("i");
               $(iconElement).toggleClass("glyphicon-floppy-save").toggleClass("glyphicon-refresh").addClass("gly-spin");
-              editShutter(mydata.id, mydata.name, function(){
+              editShutter(mydata.id, mydata.name, mydata.duration, function(){
                  $(iconElement).toggleClass("glyphicon-floppy-save").toggleClass("glyphicon-refresh").removeClass("gly-spin")
     	         $(iconElement).parents("tr").find(".save, .edit").toggle();
 	         $(iconElement).parents("tr").find(".delete").show();

@@ -23,6 +23,7 @@ try:
     from myscheduler import Scheduler
     from mywebserver import FlaskAppWrapper
     from myalexa import Alexa
+    from mymqtt import MQTT
     from shutil import copyfile
 except Exception as e1:
     print("\n\nThis program requires the modules located from the same github repository that are not present.\n")
@@ -50,12 +51,20 @@ class Shutter(MyLog):
         else:   
            self.TXGPIO=4 # 433.42 MHz emitter on GPIO 4
         self.frame = bytearray(7)
+        self.callback = []
+        self.shutterState = {}
 
     def lower(self, shutterId):
         self.sendCommand(shutterId, self.buttonDown, 2)
+        self.shutterState[shutterId] = 0
+        for function in self.callback:
+            function(shutterId, 0)
 
     def rise(self, shutterId):
         self.sendCommand(shutterId, self.buttonUp, 2)
+        self.shutterState[shutterId] = 100
+        for function in self.callback:
+            function(shutterId, 100)
 
     def stop(self, shutterId):
         self.sendCommand(shutterId, self.buttonStop, 2)
@@ -63,15 +72,33 @@ class Shutter(MyLog):
     def program(self, shutterId):
         self.sendCommand(shutterId, self.buttonProg, 1)
 
-    def lowerPartial(self, shutterId, timer):
+    def lowerPartial(self, shutterId, percentage):
         self.sendCommand(shutterId, self.buttonDown, 2)
-        time.sleep(timer)
+        if shutterId not in self.shutterState:
+             self.shutterState[shutterId] = 100
+        time.sleep((self.shutterState[shutterId]-percentage)/100*self.config.Shutters[shutterId]['duration'])
         self.sendCommand(shutterId, self.buttonStop, 2)
+        self.shutterState[shutterId] = percentage
+        for function in self.callback:
+            function(shutterId, percentage)
 
-    def risePartial(self, shutterId, timer):
+    def risePartial(self, shutterId, percentage):
         self.sendCommand(shutterId, self.buttonUp, 2)
-        time.sleep(timer)
+        if shutterId not in self.shutterState:
+             self.shutterState[shutterId] = 0
+        time.sleep((percentage-self.shutterState[shutterId])/100*self.config.Shutters[shutterId]['duration']) 
         self.sendCommand(shutterId, self.buttonStop, 2)
+        self.shutterState[shutterId] = percentage
+        for function in self.callback:
+            function(shutterId, percentage)
+        
+    def registerCallBack(self, callbackFunction):
+        self.callback.append(callbackFunction)
+
+    def getState(self, shutterId):
+        if shutterId not in self.shutterState:
+            self.shutterState[shutterId] = 0
+        return self.shutterState[shutterId]
 
     def sendCommand(self, shutterId, button, repetition): #Sending a frame
     # Sending more than two repetitions after the original frame means a button kept pressed and moves the blind in steps 
@@ -248,6 +275,8 @@ class operateShutters(MyLog):
 
         self.alexa = Alexa(kwargs={'log':self.log, 'shutter': self.shutter, 'config': self.config})
 
+        self.mqtt = MQTT(kwargs={'log':self.log, 'shutter': self.shutter, 'config': self.config})
+
         self.ProcessCommand(args);
 
     #------------------------ operateShutters::IsLoaded -----------------------------
@@ -325,6 +354,9 @@ class operateShutters(MyLog):
              if (args.echo == True):
                  self.alexa.setDaemon(True)
                  self.alexa.start()
+             if (args.mqtt == True):
+                 self.mqtt.setDaemon(True)
+                 self.mqtt.start()
              self.scheduler.join()
        elif (args.auto == True):
              self.schedule.loadScheudleFromConfig()
@@ -334,6 +366,9 @@ class operateShutters(MyLog):
              if (args.echo == True):
                  self.alexa.setDaemon(True)
                  self.alexa.start()
+             if (args.mqtt == True):
+                 self.mqtt.setDaemon(True)
+                 self.mqtt.start()
              self.webServer = FlaskAppWrapper(name='WebServer', static_url_path=os.path.dirname(os.path.realpath(__file__))+'/html', log = self.log, shutter = self.shutter, schedule = self.schedule, config = self.config)
              self.webServer.run()
        else:
@@ -342,7 +377,14 @@ class operateShutters(MyLog):
        if (args.echo == True):
            self.alexa.setDaemon(True)
            self.alexa.start()
+       if (args.mqtt == True):
+           self.mqtt.setDaemon(True)
+           self.mqtt.start()
+
+       if (args.echo == True):
            self.alexa.join()
+       if (args.mqtt == True):
+           self.mqtt.join()
        self.LogInfo ("Process Command Completed....")      
        self.Close();
     
@@ -369,6 +411,11 @@ class operateShutters(MyLog):
                 self.alexa.shutdown_flag.set()
                 self.alexa.join()
                 self.LogError("Alexa Listener stopped. Now exiting.")
+            if (not self.mqtt == None):
+                self.LogError("Stopping MQTT Listener. This can take up to 1 second...")
+                self.mqtt.shutdown_flag.set()
+                self.mqtt.join()
+                self.LogError("MQTT Listener stopped. Now exiting.")
             if (not self.webServer == None):
                 self.LogError("Stopping WebServer. This can take up to 1 second...")
                 self.webServer.shutdown_server()
@@ -391,6 +438,7 @@ if __name__ == '__main__':
     parser.add_argument('-duskdawn', '-dd', type=int, nargs=2, help='Automatically lower the shutter at sunset and rise the shutter at sunrise, provide the evening delay and morning delay in minutes each')
     parser.add_argument('-auto', '-a', help='Run schedule based on config. Also will start up the web-server which can be used to setup the schedule. Try: https://'+socket.gethostname(), action='store_true')
     parser.add_argument('-echo', '-e', help='Enable Amazon Alexa (Echo) integration', action='store_true')
+    parser.add_argument('-mqtt', '-m', help='Enable MQTT integration', action='store_true')
     args = parser.parse_args()
     
     #Start things up

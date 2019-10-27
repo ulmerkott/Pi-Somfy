@@ -59,14 +59,29 @@ class MyConfig (MyLog):
                 self.LogErrorLine("Missing config file or config file entries in Section General for key "+key+": " + str(e1))
                 return False
 
+        parameters = {'MQTT_Server': str, 'MQTT_Port': int, 'MQTT_User': str, 'MQTT_Password': str, 'EnableDiscovery': bool}
+        
+        self.SetSection("MQTT");
+        for key, type in parameters.items():
+            try:
+                if self.HasOption(key):
+                    setattr(self, key, self.ReadValue(key, return_type=type))
+            except Exception as e1:
+                self.LogErrorLine("Missing config file or config file entries in Section General for key "+key+": " + str(e1))
+                return False
+
         self.SetSection("Shutters");
         shutters = self.GetList();
         for key, value in shutters:
             try:
                 param1 = value.split(",")
                 if param1[1].strip().lower() == 'true':
+                   if (len(param1) < 3):
+                       param1.append("10");
+                   elif (param1[2].strip() == "") or (int(param1[2]) <= 0) or (int(param1[2]) >= 100):
+                       param1[2] = "10"
                    param2 = int(self.ReadValue(key, section="ShutterRollingCodes", return_type=int))
-                   self.Shutters[key] = {'name': param1[0], 'code': param2}
+                   self.Shutters[key] = {'name': param1[0], 'code': param2, 'duration': int(param1[2])}
                    self.ShuttersByName[param1[0]] = key
             except Exception as e1:
                 self.LogErrorLine("Missing config file or config file entries in Section Shutters for key "+key+": " + str(e1))
