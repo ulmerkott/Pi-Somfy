@@ -79,11 +79,11 @@ Next, we need to install the PIGPIO libraries, to do so, type:
 
 Next install the required Python Libraries:
 
-    sudo pip3 install ephem configparser Flask
+    sudo pip3 install ephem configparser Flask paho-mqtt
    
 If you decided to use Python 2, the last command will read instead:
 
-    sudo pip install ephem configparser Flask
+    sudo pip install ephem configparser Flask paho-mqtt
 
 Next, let's test if it all works. Start <operateShutters.py> by typing:
 
