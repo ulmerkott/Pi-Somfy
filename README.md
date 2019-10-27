@@ -136,14 +136,19 @@ sudo /home/pi/Pi-Somfy/operateShutters.py corridor -c /home/pi/Pi-Somfy/operateS
     sudo python /home/pi/Pi-Somfy/operateShutters.py -c /home/pi/Pi-Somfy/operateShutters.conf -a -e
 ```    
 
-4. Finally, the recommended way to operate it is using crontab on boot time. You can do so by typing:
+4. Manually start Web interface and MQTT integration (for Home Assistant)<br/>You can start the web-interface by typing:
+```csh
+    sudo python /home/pi/Pi-Somfy/operateShutters.py -c /home/pi/Pi-Somfy/operateShutters.conf -a -m
+```    
+
+5. Finally, the recommended way to operate it is using crontab on boot time. You can do so by typing:
 ```csh
     sudo crontab –e 
 ```
 Note, that "crontab -e" will just open a console-based text editor that you can edit the crontab script. The first time you run "crontab -e" you will be prompted to choose the editor. I recommend nano. From the crontab window, add the following to the bottom of the crontab script
 
-    @reboot sleep 60;python /home/pi/Pi-Somfy/operateShutters.py -c /home/pi/Pi-Somfy/operateShutters.conf -a -e
-    0 * * * * python /home/pi/Pi-Somfy/operateShutters.py -c /home/pi/Pi-Somfy/operateShutters.conf -a -e 
+    @reboot sleep 60;python /home/pi/Pi-Somfy/operateShutters.py -c /home/pi/Pi-Somfy/operateShutters.conf -a -e -m
+    0 * * * * python /home/pi/Pi-Somfy/operateShutters.py -c /home/pi/Pi-Somfy/operateShutters.conf -a -e -m
 
 And save the crontab schedule. (if using nano type press ctrl-o to save the file, ctrl-x to exit nano). Now, every time your system is booted operateShutters will start.
 
