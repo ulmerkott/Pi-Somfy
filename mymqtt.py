@@ -1,10 +1,6 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #
-##############################################################################################
-#### BASED ON WORK BY : https://github.com/nassir-malik/IOT-Pi3-MQTT-Automation          ####
-##############################################################################################
-
 
 import sys, re, argparse
 import fcntl
