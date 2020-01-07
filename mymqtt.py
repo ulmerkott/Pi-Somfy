@@ -53,7 +53,7 @@ class MQTT(threading.Thread, MyLog):
                 self.LogInfo("sending message: "+str(msg))
                 if msg == "STOP":
                     self.shutter.stop(shutterId)
-                if int(msg) == 0:
+                elif int(msg) == 0:
                     self.shutter.lower(shutterId)
                 elif int(msg) == 100:
                     self.shutter.rise(shutterId)
