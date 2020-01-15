@@ -194,7 +194,7 @@ This Library was ported from [Arduino sketch](https://github.com/Nickduino/Somfy
 If you want to learn more about the Somfy RTS protocol, check out [Pushtack](https://pushstack.wordpress.com/somfy-rts-protocol/). 
 
 
-## 8 Licence
-![Image of the licence](https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png)
+## 8 License
+![Image of the license](https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png)
 
 [Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
