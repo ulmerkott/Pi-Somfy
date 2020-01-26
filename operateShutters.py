@@ -30,13 +30,24 @@ except Exception as e1:
     print("Error: " + str(e1))
     sys.exit(2)
 
-
 class Shutter(MyLog):
     #Button values
     buttonUp = 0x2
     buttonStop = 0x1
     buttonDown = 0x4
     buttonProg = 0x8
+
+    class ShutterState: # Definition of one shutter state
+        position = None # as percentage: 0 = closed, 100 = open
+        lastCommandTime = None # get using time.monotonic()
+        lastCommandDirection = None # 'up' or 'down' or None
+        
+        def __init__(self, initPosition = None):
+            self.position = initPosition
+          
+        def registerCommand(self, commandDirection):
+            self.lastCommandDirection = commandDirection
+            self.lastCommandTime = time.monotonic()
 
     def __init__(self, log = None, config = None):
         super(Shutter, self).__init__()
@@ -52,53 +63,130 @@ class Shutter(MyLog):
            self.TXGPIO=4 # 433.42 MHz emitter on GPIO 4
         self.frame = bytearray(7)
         self.callback = []
-        self.shutterState = {}
+        self.shutterStateList = {}
+        self.sutterStateLock = threading.Lock()
+
+    def getShutterState(self, shutterId, initialPosition = None):
+        with self.sutterStateLock:
+            if shutterId not in self.shutterStateList:
+                self.shutterStateList[shutterId] = self.ShutterState(initialPosition)
+            return self.shutterStateList[shutterId]
+
+    def getPosition(self, shutterId):
+        state = self.getShutterState(shutterId, 0)
+        return state.position
+
+    def setPosition(self, shutterId, newPosition):
+        state = self.getShutterState(shutterId)
+        with self.sutterStateLock:
+            state.position = newPosition
+        for function in self.callback:
+            function(shutterId, newPosition)
+
+    def waitAndSetFinalPosition(self, shutterId, timeToWait, newPosition):
+        state = self.getShutterState(shutterId)
+        oldPosition = state.position
+
+        self.LogDebug("["+self.config.Shutters[shutterId]['name']+"] Waiting for operation to complete for " + str(timeToWait) + " seconds")
+        time.sleep(timeToWait)
+        
+        # Only set new position if position has not been modified by other thread in between
+        if state.position == oldPosition:
+            self.LogDebug("["+self.config.Shutters[shutterId]['name']+"] Set new final position: " + str(newPosition))
+            self.setPosition(shutterId, newPosition)
+        else:
+            self.LogDebug("["+self.config.Shutters[shutterId]['name']+"] Discard final position as position is now: " + str(state.position))
 
     def lower(self, shutterId):
+        state = self.getShutterState(shutterId, 100)
+
+        self.LogInfo("["+self.config.Shutters[shutterId]['name']+"] Going down")        
         self.sendCommand(shutterId, self.buttonDown, 2)
-        self.shutterState[shutterId] = 0
-        for function in self.callback:
-            function(shutterId, 0)
+        state.registerCommand('down')
+
+        # wait and set final position only if not interrupted in between
+        timeToWait = state.position/100*self.config.Shutters[shutterId]['duration']
+        t = threading.Thread(target = self.waitAndSetFinalPosition, args = (shutterId, timeToWait, 0))
+        t.start()
+
+    def lowerPartial(self, shutterId, percentage):      
+        state = self.getShutterState(shutterId, 100)
+
+        self.LogInfo("["+self.config.Shutters[shutterId]['name']+"] Going down") 
+        self.sendCommand(shutterId, self.buttonDown, 2)
+        state.registerCommand('down')
+        time.sleep((state.position-percentage)/100*self.config.Shutters[shutterId]['duration'])
+        self.LogInfo("["+self.config.Shutters[shutterId]['name']+"] Stop at partial position requested") 
+        self.sendCommand(shutterId, self.buttonStop, 2)
+        
+        self.setPosition(shutterId, percentage)
 
     def rise(self, shutterId):
+        state = self.getShutterState(shutterId, 0)
+
+        self.LogInfo("["+self.config.Shutters[shutterId]['name']+"] Going up") 
         self.sendCommand(shutterId, self.buttonUp, 2)
-        self.shutterState[shutterId] = 100
-        for function in self.callback:
-            function(shutterId, 100)
+        state.registerCommand('up')
+        
+        # wait and set final position only if not interrupted in between
+        timeToWait = (100-state.position)/100*self.config.Shutters[shutterId]['duration']
+        t = threading.Thread(target = self.waitAndSetFinalPosition, args = (shutterId, timeToWait, 100))
+        t.start()
+
+    def risePartial(self, shutterId, percentage):
+        state = self.getShutterState(shutterId, 0)
+
+        self.LogInfo("["+self.config.Shutters[shutterId]['name']+"] Going up") 
+        self.sendCommand(shutterId, self.buttonUp, 2)
+        state.registerCommand('up')
+        time.sleep((percentage-state.position)/100*self.config.Shutters[shutterId]['duration']) 
+        self.LogInfo("["+self.config.Shutters[shutterId]['name']+"] Stop at partial position requested") 
+        self.sendCommand(shutterId, self.buttonStop, 2)
+        
+        self.setPosition(shutterId, percentage)
 
     def stop(self, shutterId):
+        state = self.getShutterState(shutterId, 50)
+        
+        self.LogInfo("["+self.config.Shutters[shutterId]['name']+"] Stopping") 
         self.sendCommand(shutterId, self.buttonStop, 2)
+
+        self.LogDebug("["+shutterId+"] Previous position: " + str(state.position))
+        secondsSinceLastCommand = int(round(time.monotonic() - state.lastCommandTime))
+        self.LogDebug("["+shutterId+"] Seconds since last command: " + str(secondsSinceLastCommand))
+        
+        # Compute position based on time elapsed since last command & command direction
+        setupDuration = self.config.Shutters[shutterId]['duration']
+        if secondsSinceLastCommand > 0 & secondsSinceLastCommand < setupDuration:
+            durationPercentage = int(round(secondsSinceLastCommand/setupDuration * 100))
+            self.LogDebug("["+shutterId+"] Duration percentage: " + str(durationPercentage))
+            if state.lastCommandDirection == 'up':
+                if state.position > 0: # after rise from intermediate position
+                    newPosition = state.position + durationPercentage
+                else: # after rise from fully closed
+                    newPosition = durationPercentage
+            elif state.lastCommandDirection == 'down':
+                if state.position < 100: # after rise from intermediate position
+                    newPosition = state.position - durationPercentage
+                else: # after down from fully opened
+                    newPosition = durationPercentage
+            else: # consecutive stops 
+                newPosition = durationPercentage            
+        else: #fallback
+            self.LogWarn("["+shutterId+"] Too much time since last command, unable to compute correct position")
+            newPosition = 50
+
+        # Save computed position
+        self.setPosition(shutterId, newPosition)
+
+        # Register command at the end to not impact the lastCommand timer
+        state.registerCommand(None)
 
     def program(self, shutterId):
         self.sendCommand(shutterId, self.buttonProg, 1)
-
-    def lowerPartial(self, shutterId, percentage):
-        self.sendCommand(shutterId, self.buttonDown, 2)
-        if shutterId not in self.shutterState:
-             self.shutterState[shutterId] = 100
-        time.sleep((self.shutterState[shutterId]-percentage)/100*self.config.Shutters[shutterId]['duration'])
-        self.sendCommand(shutterId, self.buttonStop, 2)
-        self.shutterState[shutterId] = percentage
-        for function in self.callback:
-            function(shutterId, percentage)
-
-    def risePartial(self, shutterId, percentage):
-        self.sendCommand(shutterId, self.buttonUp, 2)
-        if shutterId not in self.shutterState:
-             self.shutterState[shutterId] = 0
-        time.sleep((percentage-self.shutterState[shutterId])/100*self.config.Shutters[shutterId]['duration']) 
-        self.sendCommand(shutterId, self.buttonStop, 2)
-        self.shutterState[shutterId] = percentage
-        for function in self.callback:
-            function(shutterId, percentage)
         
     def registerCallBack(self, callbackFunction):
         self.callback.append(callbackFunction)
-
-    def getState(self, shutterId):
-        if shutterId not in self.shutterState:
-            self.shutterState[shutterId] = 0
-        return self.shutterState[shutterId]
 
     def sendCommand(self, shutterId, button, repetition): #Sending a frame
     # Sending more than two repetitions after the original frame means a button kept pressed and moves the blind in steps 
@@ -450,6 +538,3 @@ if __name__ == '__main__':
         sys.exit(0)
     except:
         sys.exit(1)
-
-
-

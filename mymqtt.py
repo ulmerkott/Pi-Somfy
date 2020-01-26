@@ -58,10 +58,10 @@ class MQTT(threading.Thread, MyLog):
                 elif int(msg) == 100:
                     self.shutter.rise(shutterId)
                 elif (int(msg) > 0) and (int(msg) < 100):
-                    currentState = self.shutter.getState(shutterId)
-                    if int(msg) > currentState:
+                    currentPosition = self.shutter.getPosition(shutterId)
+                    if int(msg) > currentPosition:
                         self.shutter.risePartial(shutterId, int(msg))
-                    elif int(msg) < currentState:   
+                    elif int(msg) < currentPosition:   
                         self.shutter.lowerPartial(shutterId, int(msg))
             else:
                 self.LogError("received unkown message: "+topic+", message: "+msg)
