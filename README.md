@@ -200,7 +200,7 @@ MQTT_Password = xxxxxxx
 ``
 and make sure they match the setup of you MQTT Broker. If you are using Home Assistant, you can conveniantly use the "Mosquitto broker" add-on inside Home Assistant. For more information refer to the relevant [Documentation](https://github.com/home-assistant/hassio-addons/tree/master/mosquitto)
 
-If you choose not to use the Home Assistant add-in, you can download the [Mosquitto Broker](https://mosquitto.org/) and refer to the [Broker configuratio](https://mosquitto.org/man/mosquitto-8.html)
+If you choose not to use the Home Assistant add-in, you can download the [Mosquitto Broker](https://mosquitto.org/) and refer to the [Broker configuration](https://mosquitto.org/man/mosquitto-8.html)
 
 Second start `operateShutter.py` with the "-m" option. This should look similar to this:
 
