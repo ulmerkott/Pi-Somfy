@@ -52,7 +52,7 @@ The next step is to download the Pi-Somfy project files to your Raspberry Pi. Th
 
 Whether or not it is already installed, it's good practice to type the following:
 
-```csh
+```sh
 sudo apt-get update
 sudo apt-get install git
 ```
@@ -60,7 +60,7 @@ sudo apt-get install git
 
 Once git is installed on your system, make sure you are in the /home/pi directory, then type:
 
-```csh
+```sh
 git clone https://github.com/Nickduino/Pi-Somfy.git
 ```
 
@@ -70,38 +70,38 @@ Next, we need to install Python Libraries. Before doing so, you have to decide w
 
 If the program 'pip3' is not installed on your system, type:
 
-```csh
+```sh
 sudo apt-get update
 sudo apt-get install python3-pip
 ```
     
 If you decided to use Python 2, the last command will read instead:
 
-```csh
+```sh
 sudo apt-get install python-pip
 ```
 
 Next, we need to install the PIGPIO libraries, to do so, type:
 
-```csh
+```sh
 sudo apt-get install pigpio python-pigpio python3-pigpio
 ```
 
 Next install the required Python Libraries:
 
-```csh
+```sh
 sudo pip3 install ephem configparser Flask paho-mqtt
 ```
    
 If you decided to use Python 2, the last command will read instead:
 
-```csh
+```sh
 sudo pip install ephem configparser Flask paho-mqtt
 ```
 
 Next, let's test if it all works. Start <operateShutters.py> by typing:
 
-```csh
+```sh
 sudo python3 /home/pi/Pi-Somfy/operateShutters.py
 ```
 
@@ -137,29 +137,29 @@ You have 4 ways to operate. The recommended operation mode is mode 4. But the ot
 
 **Examples:**
 All three command the shutter named corridor. The first one will raise it. The second one will lower it. The third one will lower the shutter at sunset and raise it again 60 minutes after sunrise.
-```csh
+```sh
 sudo /home/pi/Pi-Somfy/operateShutters.py corridor -c /home/pi/Pi-Somfy/operateShutters.conf -u
 sudo /home/pi/Pi-Somfy/operateShutters.py corridor -c /home/pi/Pi-Somfy/operateShutters.conf -d
 sudo /home/pi/Pi-Somfy/operateShutters.py corridor -c /home/pi/Pi-Somfy/operateShutters.conf -dd 0 60
 ``` 
 
 2. Manually start Web interface only<br/>You can start the web-interface by typing:<br/>Once started, you can access the web interface at http://IPaddressOfYouPi:80. From there you can further modify your settings.   
-```csh
+```sh
 sudo python3 /home/pi/Pi-Somfy/operateShutters.py -c /home/pi/Pi-Somfy/operateShutters.conf -a 
 ```    
 
 3. Manually start Web interface and Alexa interface<br/>You can start the web-interface by typing:
-```csh
+```sh
 sudo python3 /home/pi/Pi-Somfy/operateShutters.py -c /home/pi/Pi-Somfy/operateShutters.conf -a -e
 ```    
 
 4. Manually start Web interface and MQTT integration (for Home Assistant)<br/>You can start the web-interface by typing:
-```csh
+```sh
 sudo python3 /home/pi/Pi-Somfy/operateShutters.py -c /home/pi/Pi-Somfy/operateShutters.conf -a -m
 ```    
 
 5. Finally, the recommended way to operate it is using crontab on boot time. You can do so by typing:
-```csh
+```sh
 sudo crontab –e 
 ```
 Note, that "crontab -e" will just open a console-based text editor that you can edit the crontab script. The first time you run "crontab -e" you will be prompted to choose the editor. I recommend nano. From the crontab window, add the following to the bottom of the crontab script
@@ -175,7 +175,7 @@ The program is not known to crash. Hence restarting it every hour is not really 
 
 To stop the program from running in the background, type:
 
-```csh
+```sh
 sudo pkill –f operateShutters.py
 ```
 
@@ -225,7 +225,7 @@ If you choose not to use the Home Assistant add-in, you can download the [Mosqui
 
 Second start `operateShutter.py` with the "-m" option. This should look similar to this:
 
-```csh
+```sh
 operateShutters.py -c /home/pi/Pi-Somfy/operateShutters.conf -a -m
 ```
 
