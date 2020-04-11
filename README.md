@@ -52,13 +52,17 @@ The next step is to download the Pi-Somfy project files to your Raspberry Pi. Th
 
 Whether or not it is already installed, it's good practice to type the following:
 
-    sudo apt-get update
-    sudo apt-get install git
+```sh
+sudo apt-get update
+sudo apt-get install git
+```
 (If git isn't installed, it will install it; if it was previously, it will update it)
 
 Once git is installed on your system, make sure you are in the /home/pi directory, then type:
 
-    git clone https://github.com/Nickduino/Pi-Somfy.git
+```sh
+git clone https://github.com/Nickduino/Pi-Somfy.git
+```
 
 The above command will make a directory in /home/pi named Pi-Somfy and put the project files in this directory.
 
@@ -66,28 +70,40 @@ Next, we need to install Python Libraries. Before doing so, you have to decide w
 
 If the program 'pip3' is not installed on your system, type:
 
-    sudo apt-get update
-    sudo apt-get install python3-pip
+```sh
+sudo apt-get update
+sudo apt-get install python3-pip
+```
     
 If you decided to use Python 2, the last command will read instead:
 
-    sudo apt-get install python-pip
+```sh
+sudo apt-get install python-pip
+```
 
 Next, we need to install the PIGPIO libraries, to do so, type:
 
-    sudo apt-get install pigpio python-pigpio python3-pigpio
+```sh
+sudo apt-get install pigpio python-pigpio python3-pigpio
+```
 
 Next install the required Python Libraries:
 
-    sudo pip3 install ephem configparser Flask paho-mqtt
+```sh
+sudo pip3 install ephem configparser Flask paho-mqtt
+```
    
 If you decided to use Python 2, the last command will read instead:
 
-    sudo pip install ephem configparser Flask paho-mqtt
+```sh
+sudo pip install ephem configparser Flask paho-mqtt
+```
 
 Next, let's test if it all works. Start <operateShutters.py> by typing:
 
-    sudo python3 /home/pi/Pi-Somfy/operateShutters.py
+```sh
+sudo python3 /home/pi/Pi-Somfy/operateShutters.py
+```
 
 You should see the help text explaining the [Command Line Interface](documentation/p4.png)
 
@@ -121,35 +137,37 @@ You have 4 ways to operate. The recommended operation mode is mode 4. But the ot
 
 **Examples:**
 All three command the shutter named corridor. The first one will raise it. The second one will lower it. The third one will lower the shutter at sunset and raise it again 60 minutes after sunrise.
-```csh
+```sh
 sudo /home/pi/Pi-Somfy/operateShutters.py corridor -c /home/pi/Pi-Somfy/operateShutters.conf -u
 sudo /home/pi/Pi-Somfy/operateShutters.py corridor -c /home/pi/Pi-Somfy/operateShutters.conf -d
 sudo /home/pi/Pi-Somfy/operateShutters.py corridor -c /home/pi/Pi-Somfy/operateShutters.conf -dd 0 60
 ``` 
 
 2. Manually start Web interface only<br/>You can start the web-interface by typing:<br/>Once started, you can access the web interface at http://IPaddressOfYouPi:80. From there you can further modify your settings.   
-```csh
-    sudo python3 /home/pi/Pi-Somfy/operateShutters.py -c /home/pi/Pi-Somfy/operateShutters.conf -a 
+```sh
+sudo python3 /home/pi/Pi-Somfy/operateShutters.py -c /home/pi/Pi-Somfy/operateShutters.conf -a 
 ```    
 
 3. Manually start Web interface and Alexa interface<br/>You can start the web-interface by typing:
-```csh
-    sudo python3 /home/pi/Pi-Somfy/operateShutters.py -c /home/pi/Pi-Somfy/operateShutters.conf -a -e
+```sh
+sudo python3 /home/pi/Pi-Somfy/operateShutters.py -c /home/pi/Pi-Somfy/operateShutters.conf -a -e
 ```    
 
 4. Manually start Web interface and MQTT integration (for Home Assistant)<br/>You can start the web-interface by typing:
-```csh
-    sudo python3 /home/pi/Pi-Somfy/operateShutters.py -c /home/pi/Pi-Somfy/operateShutters.conf -a -m
+```sh
+sudo python3 /home/pi/Pi-Somfy/operateShutters.py -c /home/pi/Pi-Somfy/operateShutters.conf -a -m
 ```    
 
 5. Finally, the recommended way to operate it is using crontab on boot time. You can do so by typing:
-```csh
-    sudo crontab –e 
+```sh
+sudo crontab –e 
 ```
 Note, that "crontab -e" will just open a console-based text editor that you can edit the crontab script. The first time you run "crontab -e" you will be prompted to choose the editor. I recommend nano. From the crontab window, add the following to the bottom of the crontab script
 
-    @reboot sleep 60;python3 /home/pi/Pi-Somfy/operateShutters.py -c /home/pi/Pi-Somfy/operateShutters.conf -a -e -m
-    0 * * * * python3 /home/pi/Pi-Somfy/operateShutters.py -c /home/pi/Pi-Somfy/operateShutters.conf -a -e -m
+```
+@reboot sleep 60;python3 /home/pi/Pi-Somfy/operateShutters.py -c /home/pi/Pi-Somfy/operateShutters.conf -a -e -m
+0 * * * * python3 /home/pi/Pi-Somfy/operateShutters.py -c /home/pi/Pi-Somfy/operateShutters.conf -a -e -m
+```
 
 And save the crontab schedule. (if using nano type press ctrl-o to save the file, ctrl-x to exit nano). Now, every time your system is booted operateShutters will start.
 
@@ -157,7 +175,9 @@ The program is not known to crash. Hence restarting it every hour is not really 
 
 To stop the program from running in the background, type:
 
-    sudo pkill –f operateShutters.py  
+```sh
+sudo pkill –f operateShutters.py
+```
 
 ## 5 Web GUI
 
@@ -193,18 +213,21 @@ While the MQTT integration was written specifically for [Home Assistant](https:/
 
 First, to use this integration, make sure you configure your `operateShutters.conf` with the right parameters. Look out for the following lines:
 
-``MQTT_Server = 192.168.1.x
+```
+MQTT_Server = 192.168.1.x
 MQTT_Port = 1883
 MQTT_User = xxxxxxx
 MQTT_Password = xxxxxxx
-``
+```
 and make sure they match the setup of you MQTT Broker. If you are using Home Assistant, you can conveniantly use the "Mosquitto broker" add-on inside Home Assistant. For more information refer to the relevant [Documentation](https://github.com/home-assistant/hassio-addons/tree/master/mosquitto)
 
 If you choose not to use the Home Assistant add-in, you can download the [Mosquitto Broker](https://mosquitto.org/) and refer to the [Broker configuration](https://mosquitto.org/man/mosquitto-8.html)
 
 Second start `operateShutter.py` with the "-m" option. This should look similar to this:
 
-```operateShutters.py -c /home/pi/Pi-Somfy/operateShutters.conf -a -m```
+```sh
+operateShutters.py -c /home/pi/Pi-Somfy/operateShutters.conf -a -m
+```
 
 And that's it, you are all set. 
 
@@ -214,13 +237,15 @@ So if you use Home Assistant, you have 2 options:
 
 To do so, add the following line to `operateShutters.conf`
 
-```EnableDiscovery = true```
+```
+EnableDiscovery = true
+```
 
 and also add the following line to your `configuration.yaml` in Home Assistant:
 
 ```
-   mqtt:
-   discovery: true
+mqtt:
+discovery: true
 ```
    
 Note that both Pi-Somfy & Home Assistant need to be restarted before this will work. Home Assistant will henceforth auto discover any new  shutters you add
