@@ -91,10 +91,17 @@ class FlaskAppWrapper(MyLog):
             return Response("Error: Exception occured", status=400)
 
     def validatePassword(self, header=True):
+        # If no password configured, it's OK
+        if self.config.Password == "":
+            return True
+
         if header:
+            # Support password from 'Password' header
             password = request.headers.get("Password")
         else:
+            # Support password from 'Password' url param
             password = request.args.get("Password")
+
         if password != self.config.Password:
             self.LogDebug("received invalid password")
             self.LogDebug(password)
