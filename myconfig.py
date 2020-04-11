@@ -30,6 +30,7 @@ class MyConfig (MyLog):
         self.Shutters = {}
         self.ShuttersByName = {}
         self.Schedule = {}
+        self.Password = ""
 
         try:
             self.config = RawConfigParser()
@@ -48,7 +49,7 @@ class MyConfig (MyLog):
     # -------------------- MyConfig::LoadConfig-----------------------------------
     def LoadConfig(self):
 
-        parameters = {'LogLocation': str, 'Latitude': float, 'Longitude': float, 'SendRepeat': int, 'UseHttps': bool, 'HTTPPort': int, 'HTTPSPort': int, 'TXGPIO': int, 'RTS_Address': str}
+        parameters = {'LogLocation': str, 'Latitude': float, 'Longitude': float, 'SendRepeat': int, 'UseHttps': bool, 'HTTPPort': int, 'HTTPSPort': int, 'TXGPIO': int, 'RTS_Address': str, "Password": str}
         
         self.SetSection("General");
         for key, type in parameters.items():
