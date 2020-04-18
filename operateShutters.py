@@ -44,7 +44,7 @@ class Shutter(MyLog):
         
         def __init__(self, initPosition = None):
             self.position = initPosition
-	    self.lastCommandTime = time.monotonic()
+            self.lastCommandTime = time.monotonic()
           
         def registerCommand(self, commandDirection):
             self.lastCommandDirection = commandDirection
