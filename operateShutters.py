@@ -102,7 +102,7 @@ class Shutter(MyLog):
         state = self.getShutterState(shutterId, 100)
 
         self.LogInfo("["+self.config.Shutters[shutterId]['name']+"] Going down")        
-        self.sendCommand(shutterId, self.buttonDown, 2)
+        self.sendCommand(shutterId, self.buttonDown, self.config.SendRepeat)
         state.registerCommand('down')
 
         # wait and set final position only if not interrupted in between
@@ -114,11 +114,11 @@ class Shutter(MyLog):
         state = self.getShutterState(shutterId, 100)
 
         self.LogInfo("["+self.config.Shutters[shutterId]['name']+"] Going down") 
-        self.sendCommand(shutterId, self.buttonDown, 2)
+        self.sendCommand(shutterId, self.buttonDown, self.config.SendRepeat)
         state.registerCommand('down')
         time.sleep((state.position-percentage)/100*self.config.Shutters[shutterId]['duration'])
         self.LogInfo("["+self.config.Shutters[shutterId]['name']+"] Stop at partial position requested") 
-        self.sendCommand(shutterId, self.buttonStop, 2)
+        self.sendCommand(shutterId, self.buttonStop, self.config.SendRepeat)
         
         self.setPosition(shutterId, percentage)
 
@@ -126,7 +126,7 @@ class Shutter(MyLog):
         state = self.getShutterState(shutterId, 0)
 
         self.LogInfo("["+self.config.Shutters[shutterId]['name']+"] Going up") 
-        self.sendCommand(shutterId, self.buttonUp, 2)
+        self.sendCommand(shutterId, self.buttonUp, self.config.SendRepeat)
         state.registerCommand('up')
         
         # wait and set final position only if not interrupted in between
@@ -138,11 +138,11 @@ class Shutter(MyLog):
         state = self.getShutterState(shutterId, 0)
 
         self.LogInfo("["+self.config.Shutters[shutterId]['name']+"] Going up") 
-        self.sendCommand(shutterId, self.buttonUp, 2)
+        self.sendCommand(shutterId, self.buttonUp, self.config.SendRepeat)
         state.registerCommand('up')
         time.sleep((percentage-state.position)/100*self.config.Shutters[shutterId]['duration']) 
         self.LogInfo("["+self.config.Shutters[shutterId]['name']+"] Stop at partial position requested") 
-        self.sendCommand(shutterId, self.buttonStop, 2)
+        self.sendCommand(shutterId, self.buttonStop, self.config.SendRepeat)
         
         self.setPosition(shutterId, percentage)
 
@@ -150,7 +150,7 @@ class Shutter(MyLog):
         state = self.getShutterState(shutterId, 50)
         
         self.LogInfo("["+self.config.Shutters[shutterId]['name']+"] Stopping") 
-        self.sendCommand(shutterId, self.buttonStop, 2)
+        self.sendCommand(shutterId, self.buttonStop, self.config.SendRepeat)
 
         self.LogDebug("["+shutterId+"] Previous position: " + str(state.position))
         secondsSinceLastCommand = int(round(time.monotonic() - state.lastCommandTime))
