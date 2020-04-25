@@ -289,6 +289,7 @@ class Shutter(MyLog):
                              wf.append(pigpio.pulse(0, 1<<self.TXGPIO, 640))
         
                     wf.append(pigpio.pulse(0, 1<<self.TXGPIO, 30415)) # interframe gap
+		    time.sleep(0.25) # small pause before repetition, see issue 45
         
            pi.wave_add_generic(wf)
            wid = pi.wave_create()
