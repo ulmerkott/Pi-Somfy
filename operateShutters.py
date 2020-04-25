@@ -158,7 +158,7 @@ class Shutter(MyLog):
         
         # Compute position based on time elapsed since last command & command direction
         setupDuration = self.config.Shutters[shutterId]['duration']
-        if secondsSinceLastCommand > 0 & secondsSinceLastCommand < setupDuration:
+        if secondsSinceLastCommand > 0 and secondsSinceLastCommand < setupDuration:
             durationPercentage = int(round(secondsSinceLastCommand/setupDuration * 100))
             self.LogDebug("["+shutterId+"] Duration percentage: " + str(durationPercentage))
             if state.lastCommandDirection == 'up':
