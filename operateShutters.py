@@ -140,39 +140,41 @@ class Shutter(MyLog):
         self.LogInfo("["+self.config.Shutters[shutterId]['name']+"] Going up") 
         self.sendCommand(shutterId, self.buttonUp, self.config.SendRepeat)
         state.registerCommand('up')
-        time.sleep((percentage-state.position)/100*self.config.Shutters[shutterId]['duration']) 
-        self.LogInfo("["+self.config.Shutters[shutterId]['name']+"] Stop at partial position requested") 
+        time.sleep((percentage-state.position)/100*self.config.Shutters[shutterId]['duration'])
+        self.LogInfo("["+self.config.Shutters[shutterId]['name']+"] Stop at partial position requested")
         self.sendCommand(shutterId, self.buttonStop, self.config.SendRepeat)
-        
+
         self.setPosition(shutterId, percentage)
 
     def stop(self, shutterId):
         state = self.getShutterState(shutterId, 50)
-        
-        self.LogInfo("["+self.config.Shutters[shutterId]['name']+"] Stopping") 
+
+        self.LogInfo("["+self.config.Shutters[shutterId]['name']+"] Stopping")
         self.sendCommand(shutterId, self.buttonStop, self.config.SendRepeat)
 
         self.LogDebug("["+shutterId+"] Previous position: " + str(state.position))
         secondsSinceLastCommand = int(round(time.monotonic() - state.lastCommandTime))
         self.LogDebug("["+shutterId+"] Seconds since last command: " + str(secondsSinceLastCommand))
-        
+
         # Compute position based on time elapsed since last command & command direction
         setupDuration = self.config.Shutters[shutterId]['duration']
+
         if secondsSinceLastCommand > 0 and secondsSinceLastCommand < setupDuration:
             durationPercentage = int(round(secondsSinceLastCommand/setupDuration * 100))
-            self.LogDebug("["+shutterId+"] Duration percentage: " + str(durationPercentage))
+            self.LogDebug("["+shutterId+"] Duration percentage: " + str(durationPercentage) + ", State position: "+ str(state.position))
             if state.lastCommandDirection == 'up':
                 if state.position > 0: # after rise from intermediate position
-                    newPosition = state.position + durationPercentage
+                    newPosition = min (100 , state.position + durationPercentage)
                 else: # after rise from fully closed
                     newPosition = durationPercentage
             elif state.lastCommandDirection == 'down':
-                if state.position < 100: # after rise from intermediate position
-                    newPosition = state.position - durationPercentage
+                if state.position < 100: # after lower from intermediate position
+                    newPosition = max (0 , state.position - durationPercentage)
                 else: # after down from fully opened
-                    newPosition = state.position
-            else: # consecutive stops 
-                newPosition = durationPercentage            
+                    newPosition = 100 - durationPercentage
+            else: # consecutive stops
+                self.LogWarn("["+shutterId+"] Stop pressed while stationary - motor will move to preset MY position. Guess 50%")
+                newPosition = 50
         else: #fallback
             self.LogWarn("["+shutterId+"] Too much time since last command, unable to compute correct position")
             newPosition = 50
@@ -185,7 +187,7 @@ class Shutter(MyLog):
 
     def program(self, shutterId):
         self.sendCommand(shutterId, self.buttonProg, 1)
-        
+
     def registerCallBack(self, callbackFunction):
         self.callback.append(callbackFunction)
 
