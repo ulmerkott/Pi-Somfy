@@ -170,7 +170,7 @@ class Shutter(MyLog):
                 if state.position < 100: # after rise from intermediate position
                     newPosition = state.position - durationPercentage
                 else: # after down from fully opened
-                    newPosition = durationPercentage
+                    newPosition = state.position
             else: # consecutive stops 
                 newPosition = durationPercentage            
         else: #fallback
