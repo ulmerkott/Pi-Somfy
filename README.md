@@ -14,14 +14,14 @@ As of now, you have to build your own hardware. Here are the steps to do so.
 1. You need the RF Transmitter. If you wish to order it from eBay, this link maybe helpful: <br/>[Order](https://www.ebay.com/sch/sis.html?_nkw=5x+433Mhz+RF+transmitter+and+receiver+kit+Module+Arduino+ARM+WL+MCU+Raspberry).<br/>Note that desoldering a 3 pin component isn't trivial, so ordering more than one may be a good idea in case of a screw up.
 1. You need an oscillator for a 433.42 MHz frequency. The above RF transmitter comes with a common 433.93 MHz one, which will not work with your Somfy shutter. If you wish to order it from eBay, this link maybe helpful: <br/>[Order](https://www.ebay.com/sch/sis.html?_nkw=433.42M+R433+F433+SAW+Resonator+Crystals+TO-39)
 1. You will need cables to connect the transmitter to the Raspberry Pi. Any cable will do obviously, but I found these quite helpful. <br/>[Order](https://www.ebay.com/itm/40Pin-Multicolored-Dupont-Wire-Kits-Breadboard-Female-Jumper-Ribbon-Cable/113310899442)
-1. OPTIONAL: If you intend to place your Raspberry Pi furtehr than about 10 ft from your receiver (aka your shutter or awning), you may need an antenna. Literally any 17 cm solid core copper wire will do the job. But if you prefer to order a fancy full one, this one will come handy <br/>[Order](https://www.ebay.com/itm/10pcs-433MHz-antenna-Helical-antenna-Remote-Control-for-Arduino-Raspberry-pi/372691762881?hash=item56c628fec1:g:kf0AAOxyBPZTgvGe)
+1. OPTIONAL: If you intend to place your Raspberry Pi further than about 10 ft from your receiver (aka your shutter or awning), you may need an antenna. Literally any 17 cm solid core copper wire will do the job. But if you prefer to order a fancy full one, this one will come handy <br/>[Order](https://www.ebay.com/itm/10pcs-433MHz-antenna-Helical-antenna-Remote-Control-for-Arduino-Raspberry-pi/372691762881?hash=item56c628fec1:g:kf0AAOxyBPZTgvGe)
 
 Once you have all the hardware handy, it's now time to swap the oscillator, which requires a bit of soldering. Reason for this is that the emitter you bought uses a common 433.93 MHz frequency, Somfy however requires a 433.__42__ MHz frequency. Take the following steps to exchange the oscillator
 1. Identify the oscillator. It looks like this (marked with a red circle): <br/>![Front view](documentation/RF%20Transmitter%20front.jpg). <br/>Turn the RF Transmitter around. You will see that the oscillator is soldered in on 3 points <br/>![Back View](documentation/RF%20Transmitter%20back.jpg)
 1. While pulling the oscillator from the front, heat up the 3 soldering point on the back with the soldering iron until the oscillator is detached from the board
-1. Clean up the remaining solder mess on bith desoldering braid or a desoldering pump
+1. Clean up the remaining solder mess on both desoldering braid or a desoldering pump
 1. Now put in the new oscillator (make sure all 3 pins connect through the print) and solder it in again
-1. Solder an antenna to the ANT pad. The ideal is a 17 cm solid core wire but almost anything will do the job. I used this antenna from ebay ([Order](https://www.ebay.com/itm/10pcs-433MHz-antenna-Helical-antenna-Remote-Control-for-Arduino-Raspberry-pi/372691762881?hash=item56c628fec1:g:kf0AAOxyBPZTgvGe)) as I like the outlook. If your Pi is less than 10 ft from the recevier, it may work without antenna.
+1. Solder an antenna to the ANT pad. The ideal is a 17 cm solid core wire but almost anything will do the job. I used this antenna from ebay ([Order](https://www.ebay.com/itm/10pcs-433MHz-antenna-Helical-antenna-Remote-Control-for-Arduino-Raspberry-pi/372691762881?hash=item56c628fec1:g:kf0AAOxyBPZTgvGe)) as I like the outlook. If your Pi is less than 10 ft from the receiver, it may work without antenna.
 
 And you are done on the mods!
 
@@ -219,7 +219,7 @@ MQTT_Port = 1883
 MQTT_User = xxxxxxx
 MQTT_Password = xxxxxxx
 ```
-and make sure they match the setup of you MQTT Broker. If you are using Home Assistant, you can conveniantly use the "Mosquitto broker" add-on inside Home Assistant. For more information refer to the relevant [Documentation](https://github.com/home-assistant/hassio-addons/tree/master/mosquitto)
+and make sure they match the setup of you MQTT Broker. If you are using Home Assistant, you can conveniently use the "Mosquitto broker" add-on inside Home Assistant. For more information refer to the relevant [Documentation](https://github.com/home-assistant/hassio-addons/tree/master/mosquitto)
 
 If you choose not to use the Home Assistant add-in, you can download the [Mosquitto Broker](https://mosquitto.org/) and refer to the [Broker configuration](https://mosquitto.org/man/mosquitto-8.html)
 
