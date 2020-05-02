@@ -245,7 +245,7 @@ and also add the following line to your `configuration.yaml` in Home Assistant:
 
 ```
 mqtt:
-discovery: true
+  discovery: true
 ```
    
 Note that both Pi-Somfy & Home Assistant need to be restarted before this will work. Home Assistant will henceforth auto discover any new  shutters you add
@@ -261,7 +261,7 @@ cover:
      payload_open: 100
      payload_close: 0
      command_topic: 'somfy/0x2670xx/level/cmd'
-     position_topic: 'somfy/0x2670xx/level/state'
+     position_topic: 'somfy/0x2670xx/level/set_state'
      set_position_topic: 'somfy/0x2670xx/level/cmd'
      state_open: 100
      state_closed: 0
