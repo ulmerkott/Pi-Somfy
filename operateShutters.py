@@ -38,14 +38,14 @@ class Shutter(MyLog):
     buttonProg = 0x8
 
     class ShutterState: # Definition of one shutter state
-        position = None # as percentage: 0 = closed, 100 = open
+        position = None # as percentage: 0 = closed (down), 100 = open (up)
         lastCommandTime = None # get using time.monotonic()
         lastCommandDirection = None # 'up' or 'down' or None
-        
+
         def __init__(self, initPosition = None):
             self.position = initPosition
             self.lastCommandTime = time.monotonic()
-          
+
         def registerCommand(self, commandDirection):
             self.lastCommandDirection = commandDirection
             self.lastCommandTime = time.monotonic()
@@ -60,7 +60,7 @@ class Shutter(MyLog):
 
         if self.config.TXGPIO != None:
            self.TXGPIO=self.config.TXGPIO # 433.42 MHz emitter
-        else:   
+        else:
            self.TXGPIO=4 # 433.42 MHz emitter on GPIO 4
         self.frame = bytearray(7)
         self.callback = []
@@ -90,7 +90,7 @@ class Shutter(MyLog):
 
         self.LogDebug("["+self.config.Shutters[shutterId]['name']+"] Waiting for operation to complete for " + str(timeToWait) + " seconds")
         time.sleep(timeToWait)
-        
+
         # Only set new position if position has not been modified by other thread in between
         if state.position == oldPosition:
             self.LogDebug("["+self.config.Shutters[shutterId]['name']+"] Set new final position: " + str(newPosition))
@@ -101,7 +101,7 @@ class Shutter(MyLog):
     def lower(self, shutterId):
         state = self.getShutterState(shutterId, 100)
 
-        self.LogInfo("["+self.config.Shutters[shutterId]['name']+"] Going down")        
+        self.LogInfo("["+self.config.Shutters[shutterId]['name']+"] Going down")
         self.sendCommand(shutterId, self.buttonDown, self.config.SendRepeat)
         state.registerCommand('down')
 
@@ -110,25 +110,25 @@ class Shutter(MyLog):
         t = threading.Thread(target = self.waitAndSetFinalPosition, args = (shutterId, timeToWait, 0))
         t.start()
 
-    def lowerPartial(self, shutterId, percentage):      
+    def lowerPartial(self, shutterId, percentage):
         state = self.getShutterState(shutterId, 100)
 
         self.LogInfo("["+self.config.Shutters[shutterId]['name']+"] Going down") 
         self.sendCommand(shutterId, self.buttonDown, self.config.SendRepeat)
         state.registerCommand('down')
         time.sleep((state.position-percentage)/100*self.config.Shutters[shutterId]['duration'])
-        self.LogInfo("["+self.config.Shutters[shutterId]['name']+"] Stop at partial position requested") 
+        self.LogInfo("["+self.config.Shutters[shutterId]['name']+"] Stop at partial position requested")
         self.sendCommand(shutterId, self.buttonStop, self.config.SendRepeat)
-        
+
         self.setPosition(shutterId, percentage)
 
     def rise(self, shutterId):
         state = self.getShutterState(shutterId, 0)
 
-        self.LogInfo("["+self.config.Shutters[shutterId]['name']+"] Going up") 
+        self.LogInfo("["+self.config.Shutters[shutterId]['name']+"] Going up")
         self.sendCommand(shutterId, self.buttonUp, self.config.SendRepeat)
         state.registerCommand('up')
-        
+
         # wait and set final position only if not interrupted in between
         timeToWait = (100-state.position)/100*self.config.Shutters[shutterId]['duration']
         t = threading.Thread(target = self.waitAndSetFinalPosition, args = (shutterId, timeToWait, 100))
@@ -137,7 +137,7 @@ class Shutter(MyLog):
     def risePartial(self, shutterId, percentage):
         state = self.getShutterState(shutterId, 0)
 
-        self.LogInfo("["+self.config.Shutters[shutterId]['name']+"] Going up") 
+        self.LogInfo("["+self.config.Shutters[shutterId]['name']+"] Going up")
         self.sendCommand(shutterId, self.buttonUp, self.config.SendRepeat)
         state.registerCommand('up')
         time.sleep((percentage-state.position)/100*self.config.Shutters[shutterId]['duration'])
@@ -202,26 +202,26 @@ class Shutter(MyLog):
        try:
            self.LogDebug("sendCommand: Lock aquired")
            checksum = 0
-           
+
            teleco = int(shutterId, 16)
            code = int(self.config.Shutters[shutterId]['code'])
-        
+
            # print (codecs.encode(shutterId, 'hex_codec'))
            self.config.setCode(shutterId, code+1)
-        
+
            pi = pigpio.pi() # connect to Pi
-        
+
            if not pi.connected:
               exit()
-        
+
            pi.wave_add_new()
            pi.set_mode(self.TXGPIO, pigpio.OUTPUT)
-                
+
            self.LogInfo ("Remote  :      " + "0x%0.2X" % teleco + ' (' + self.config.Shutters[shutterId]['name'] + ')')
            self.LogInfo ("Button  :      " + "0x%0.2X" % button)
            self.LogInfo ("Rolling code : " + str(code))
            self.LogInfo ("")
-        
+
            self.frame[0] = 0xA7;       # Encryption key. Doesn't matter much
            self.frame[1] = button << 4 # Which button did  you press? The 4 LSB will be the checksum
            self.frame[2] = code >> 8               # Rolling code (big endian)
@@ -229,32 +229,32 @@ class Shutter(MyLog):
            self.frame[4] = teleco >> 16            # Remote address
            self.frame[5] = ((teleco >>  8) & 0xFF) # Remote address
            self.frame[6] = (teleco & 0xFF)         # Remote address
-        
+
            outstring = "Frame  :    "
            for octet in self.frame:
               outstring = outstring + "0x%0.2X" % octet + ' '
            self.LogInfo (outstring)
-        
+
            for i in range(0, 7):
               checksum = checksum ^ self.frame[i] ^ (self.frame[i] >> 4)
-        
+
            checksum &= 0b1111; # We keep the last 4 bits only
-        
+
            self.frame[1] |= checksum;
-        
+
            outstring = "With cks  : "
            for octet in self.frame:
               outstring = outstring + "0x%0.2X" % octet + ' '
            self.LogInfo (outstring)
-        
+
            for i in range(1, 7):
               self.frame[i] ^= self.frame[i-1];
-        
+
            outstring = "Obfuscated :"
            for octet in self.frame:
               outstring = outstring + "0x%0.2X" % octet + ' '
            self.LogInfo (outstring)
-        
+
            #This is where all the awesomeness is happening. You're telling the daemon what you wanna send
            wf=[]
            wf.append(pigpio.pulse(1<<self.TXGPIO, 0, 9415)) # wake up pulse
@@ -264,7 +264,7 @@ class Shutter(MyLog):
               wf.append(pigpio.pulse(0, 1<<self.TXGPIO, 2560))
            wf.append(pigpio.pulse(1<<self.TXGPIO, 0, 4550)) # software synchronization
            wf.append(pigpio.pulse(0, 1<<self.TXGPIO,  640))
-        
+
            for i in range (0, 56): # manchester enconding of payload data
               if ((self.frame[int(i/8)] >> (7 - (i%8))) & 1):
                  wf.append(pigpio.pulse(0, 1<<self.TXGPIO, 640))
@@ -272,16 +272,16 @@ class Shutter(MyLog):
               else:
                  wf.append(pigpio.pulse(1<<self.TXGPIO, 0, 640))
                  wf.append(pigpio.pulse(0, 1<<self.TXGPIO, 640))
-        
+
            wf.append(pigpio.pulse(0, 1<<self.TXGPIO, 30415)) # interframe gap
-        
+
            for j in range(1,repetition): # repeating frames
                     for i in range(7): # hardware synchronization
                           wf.append(pigpio.pulse(1<<self.TXGPIO, 0, 2560))
                           wf.append(pigpio.pulse(0, 1<<self.TXGPIO, 2560))
                     wf.append(pigpio.pulse(1<<self.TXGPIO, 0, 4550)) # software synchronization
                     wf.append(pigpio.pulse(0, 1<<self.TXGPIO,  640))
-        
+
                     for i in range (0, 56): # manchester enconding of payload data
                           if ((self.frame[int(i/8)] >> (7 - (i%8))) & 1):
                              wf.append(pigpio.pulse(0, 1<<self.TXGPIO, 640))
@@ -289,22 +289,22 @@ class Shutter(MyLog):
                           else:
                              wf.append(pigpio.pulse(1<<self.TXGPIO, 0, 640))
                              wf.append(pigpio.pulse(0, 1<<self.TXGPIO, 640))
-        
+
                     wf.append(pigpio.pulse(0, 1<<self.TXGPIO, 30415)) # interframe gap
                     time.sleep(0.25) # small pause before repetition, see issue #45
-        
+
            pi.wave_add_generic(wf)
            wid = pi.wave_create()
            pi.wave_send_once(wid)
            while pi.wave_tx_busy():
               pass
            pi.wave_delete(wid)
-        
+
            pi.stop()
        finally:
            self.lock.release()
            self.LogDebug("sendCommand: Lock released")
-           
+
 class operateShutters(MyLog):
 
     def __init__(self, args = None):
@@ -314,14 +314,14 @@ class operateShutters(MyLog):
         self.log = None
         self.IsStopping = False
         self.ProgramComplete = False
-        
+
         if args.ConfigFile == None:
             self.ConfigFile = "/etc/operateShutters.conf"
         else:
             self.ConfigFile = args.ConfigFile
 
         self.console = SetupLogger("shutters_console", log_file = "", stream = True)
-        
+
         if os.geteuid() != 0:
             self.LogConsole("You need to have root privileges to run this script.\nPlease try again, this time using 'sudo'.")
             sys.exit(1)
@@ -346,7 +346,7 @@ class operateShutters(MyLog):
         # log errors in this module to a file
         self.log = SetupLogger("shutters", self.config.LogLocation + "operateShutters.log")
         self.config.log = self.log
-        
+
         if self.IsLoaded():
             self.LogWarn("operateShutters.py is already loaded.")
             sys.exit(1)
@@ -354,7 +354,7 @@ class operateShutters(MyLog):
         if not self.startPIGPIO():
             self.LogConsole("Not able to start PIGPIO")
             sys.exit(1)
-            
+
         self.shutter = Shutter(log = self.log, config = self.config)
 
         # atexit.register(self.Close)
@@ -365,9 +365,11 @@ class operateShutters(MyLog):
         self.scheduler = None
         self.webServer = None
 
-        self.alexa = Alexa(kwargs={'log':self.log, 'shutter': self.shutter, 'config': self.config})
+        if (args.echo == True):
+            self.alexa = Alexa(kwargs={'log':self.log, 'shutter': self.shutter, 'config': self.config})
 
-        self.mqtt = MQTT(kwargs={'log':self.log, 'shutter': self.shutter, 'config': self.config})
+        if (args.mqtt == True):
+            self.mqtt = MQTT(kwargs={'log':self.log, 'shutter': self.shutter, 'config': self.config})
 
         self.ProcessCommand(args);
 
@@ -384,7 +386,7 @@ class operateShutters(MyLog):
            return False
         except IOError:
            return True
-	      
+
     #--------------------- operateShutters::startPIGPIO ------------------------------
     def startPIGPIO(self):
        if sys.version_info[0] < 3:
@@ -392,24 +394,24 @@ class operateShutters(MyLog):
            status, process = commands.getstatusoutput('sudo pidof pigpiod')
            if status:  #  it wasn't running, so start it
                self.LogInfo ("pigpiod was not running")
-               commands.getstatusoutput('sudo pigpiod')  # try to  start it
+               commands.getstatusoutput('sudo pigpiod -l -m')  # try to  start it
                time.sleep(0.5)
-               # check it again        
+               # check it again
                status, process = commands.getstatusoutput('sudo pidof pigpiod')
-       else:      
+       else:
            import subprocess
            status, process = subprocess.getstatusoutput('sudo pidof pigpiod')
            if status:  #  it wasn't running, so start it
                self.LogInfo ("pigpiod was not running")
-               subprocess.getstatusoutput('sudo pigpiod')  # try to  start it
+               subprocess.getstatusoutput('sudo pigpiod -l -m')  # try to  start it
                time.sleep(0.5)
-               # check it again        
+               # check it again
                status, process = subprocess.getstatusoutput('sudo pidof pigpiod')
-       
+
        if not status:  # if it was started successfully (or was already running)...
            pigpiod_process = process
            self.LogInfo ("pigpiod is running, process ID is {} ".format(pigpiod_process))
-       
+
            try:
                pi = pigpio.pi()  # local GPIO only
                self.LogInfo ("pigpio's pi instantiated")
@@ -425,7 +427,7 @@ class operateShutters(MyLog):
     def ProcessCommand(self, args):
        if ((args.shutterName != "") and (args.down == True)):
              self.shutter.lower(self.config.ShuttersByName[args.shutterName])
-       elif ((args.shutterName != "") and (args.up == True)): 
+       elif ((args.shutterName != "") and (args.up == True)):
              self.shutter.rise(self.config.ShuttersByName[args.shutterName])
        elif ((args.shutterName != "") and (args.stop == True)):
              self.shutter.stop(self.config.ShuttersByName[args.shutterName])
@@ -477,9 +479,9 @@ class operateShutters(MyLog):
            self.alexa.join()
        if (args.mqtt == True):
            self.mqtt.join()
-       self.LogInfo ("Process Command Completed....")      
+       self.LogInfo ("Process Command Completed....")
        self.Close();
-    
+
     #---------------------operateShutters::Close----------------------------------------
     def Close(self, signum = None, frame = None):
 
@@ -490,7 +492,7 @@ class operateShutters(MyLog):
             self.LogErrorLine("Error Closing Monitor: " + str(e1))
 
         self.LogError("operateShutters Shutdown")
-        
+
         try:
             self.ProgramComplete = True
             if (not self.scheduler == None):
@@ -532,7 +534,7 @@ if __name__ == '__main__':
     parser.add_argument('-echo', '-e', help='Enable Amazon Alexa (Echo) integration', action='store_true')
     parser.add_argument('-mqtt', '-m', help='Enable MQTT integration', action='store_true')
     args = parser.parse_args()
-    
+
     #Start things up
     MyShutter = operateShutters(args = args)
 
