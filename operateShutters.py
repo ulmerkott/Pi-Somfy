@@ -86,17 +86,17 @@ class Shutter(MyLog):
 
     def waitAndSetFinalPosition(self, shutterId, timeToWait, newPosition):
         state = self.getShutterState(shutterId)
-        oldPosition = state.position
+        oldLastCommandTime = state.lastCommandTime
 
         self.LogDebug("["+self.config.Shutters[shutterId]['name']+"] Waiting for operation to complete for " + str(timeToWait) + " seconds")
         time.sleep(timeToWait)
 
-        # Only set new position if position has not been modified by other thread in between
-        if state.position == oldPosition:
+        # Only set new position if registerCommand has not been called in between
+        if state.lastCommandTime == oldLastCommandTime:
             self.LogDebug("["+self.config.Shutters[shutterId]['name']+"] Set new final position: " + str(newPosition))
             self.setPosition(shutterId, newPosition)
         else:
-            self.LogDebug("["+self.config.Shutters[shutterId]['name']+"] Discard final position as position is now: " + str(state.position))
+            self.LogDebug("["+self.config.Shutters[shutterId]['name']+"] Discard final position. Position is now: " + str(state.position))
 
     def lower(self, shutterId):
         state = self.getShutterState(shutterId, 100)
