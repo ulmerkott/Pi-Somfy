@@ -164,12 +164,12 @@ class Shutter(MyLog):
             durationPercentage = int(round(secondsSinceLastCommand/setupDuration * 100))
             self.LogDebug("["+shutterId+"] Duration percentage: " + str(durationPercentage) + ", State position: "+ str(state.position))
             if state.lastCommandDirection == 'up':
-                if state.position > 0: # after rise from intermediate position
+                if state.position > 0: # after rise from previous position
                     newPosition = min (100 , state.position + durationPercentage)
                 else: # after rise from fully closed
                     newPosition = durationPercentage
             elif state.lastCommandDirection == 'down':
-                if state.position < 100: # after lower from intermediate position
+                if state.position < 100: # after lower from previous position
                     newPosition = max (0 , state.position - durationPercentage)
                 else: # after down from fully opened
                     newPosition = 100 - durationPercentage
@@ -180,17 +180,17 @@ class Shutter(MyLog):
             self.LogWarn("["+shutterId+"] Too much time since last command, assume it goes to preset position.")
             fallback = True
 
-        if fallback == True: # Let's assume it will end on the preset position !
-            if state.position == self.config.Shutters[shutterId]['preset']:
+        if fallback == True: # Let's assume it will end on the intermediate position !
+            if state.position == self.config.Shutters[shutterId]['intermediatePosition']:
                 newPosition = state.position
             else:
-                if state.position > self.config.Shutters[shutterId]['preset']:
+                if state.position > self.config.Shutters[shutterId]['intermediatePosition']:
                     state.registerCommand('down')
                 else:
                     state.registerCommand('up')
-                # wait and set final preset position only if not interrupted in between
-                timeToWait = abs(state.position - self.config.Shutters[shutterId]['preset']) / 100*self.config.Shutters[shutterId]['duration']
-                t = threading.Thread(target = self.waitAndSetFinalPosition, args = (shutterId, timeToWait, self.config.Shutters[shutterId]['preset']))
+                # wait and set final intermediate position only if not interrupted in between
+                timeToWait = abs(state.position - self.config.Shutters[shutterId]['intermediatePosition']) / 100*self.config.Shutters[shutterId]['duration']
+                t = threading.Thread(target = self.waitAndSetFinalPosition, args = (shutterId, timeToWait, self.config.Shutters[shutterId]['intermediatePosition']))
                 t.start()
                 return
 
