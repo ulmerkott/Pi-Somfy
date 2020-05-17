@@ -82,9 +82,9 @@ class MyConfig (MyLog):
                    elif (param1[2].strip() == "") or (int(param1[2]) <= 0) or (int(param1[2]) >= 100):
                        param1[2] = "10"
                    param2 = int(self.ReadValue(key, section="ShutterRollingCodes",          return_type=int))
-                   param3 = int(self.ReadValue(key, section="ShutterIntermediatePositions", return_type=int, default = 50))
-                   if (param3 < 0) or (param3 > 100):
-                       param3 = 50
+                   param3 =     self.ReadValue(key, section="ShutterIntermediatePositions", return_type=int)
+                   if (param3 != None) and ((param3 < 0) or (param3 > 100)):
+                       param3  = None
                    self.Shutters[key] = {'name': param1[0], 'code': param2, 'duration': int(param1[2]), 'intermediatePosition': param3}
                    self.ShuttersByName[param1[0]] = key
             except Exception as e1:

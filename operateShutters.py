@@ -174,23 +174,26 @@ class Shutter(MyLog):
                 else: # after down from fully opened
                     newPosition = 100 - durationPercentage
             else: # consecutive stops
-                self.LogWarn("["+shutterId+"] Stop pressed while stationary - motor will move to preset MY position.")
+                self.LogWarn("["+shutterId+"] Stop pressed while stationary.")
                 fallback = True
         else:  #fallback
-            self.LogWarn("["+shutterId+"] Too much time since last command, assume it goes to preset position.")
+            self.LogWarn("["+shutterId+"] Too much time since last command.")
             fallback = True
 
-        if fallback == True: # Let's assume it will end on the intermediate position !
-            if state.position == self.config.Shutters[shutterId]['intermediatePosition']:
+        if fallback == True: # Let's assume it will end on the intermediate position ! If it exists !
+            intermediatePosition = self.config.Shutters[shutterId]['intermediatePosition']
+            if (intermediatePosition == None) or (intermediatePosition == state.position):
+                self.LogInfo("["+shutterId+"] Stay stationary.")
                 newPosition = state.position
             else:
-                if state.position > self.config.Shutters[shutterId]['intermediatePosition']:
+                self.LogInfo("["+shutterId+"] Motor expected to move to intermediate position "+str(intermediatePosition))
+                if state.position > intermediatePosition:
                     state.registerCommand('down')
                 else:
                     state.registerCommand('up')
                 # wait and set final intermediate position only if not interrupted in between
-                timeToWait = abs(state.position - self.config.Shutters[shutterId]['intermediatePosition']) / 100*self.config.Shutters[shutterId]['duration']
-                t = threading.Thread(target = self.waitAndSetFinalPosition, args = (shutterId, timeToWait, self.config.Shutters[shutterId]['intermediatePosition']))
+                timeToWait = abs(state.position - intermediatePosition) / 100*self.config.Shutters[shutterId]['duration']
+                t = threading.Thread(target = self.waitAndSetFinalPosition, args = (shutterId, timeToWait, intermediatePosition))
                 t.start()
                 return
 
