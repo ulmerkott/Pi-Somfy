@@ -111,7 +111,7 @@ You should see the help text explaining the [Command Line Interface](documentati
 
 Note that the config file won't exists the first time you run the application. In that case, a new config file will be created based on the name you specified (e.g. /home/pi/Pi-Somfy/operateShutters.conf). Once it has been created, you can modify it to change your need (SSL or not, which port is used, etc.), it will not be erased with an update. If you messed up something, just delete it and relaunch operateShutters.py, a new vanilla copy will be generated.
 
-You have 4 ways to operate. The recommended operation mode is mode 4. But the other 3 modes are explained here for completeness:
+You have 6 ways to operate. The recommended operation mode is mode 5. But the other 5 modes are explained here for completeness:
 
 1. Command line Interface<br/>You can use either of the following commands to operate a shutter called<br/>
 
@@ -158,7 +158,34 @@ sudo python3 /home/pi/Pi-Somfy/operateShutters.py -c /home/pi/Pi-Somfy/operateSh
 sudo python3 /home/pi/Pi-Somfy/operateShutters.py -c /home/pi/Pi-Somfy/operateShutters.conf -a -m
 ```    
 
-5. Finally, the recommended way to operate it is using crontab on boot time. You can do so by typing:
+5. Finally, the recommended way to operate it is using a systemd service on boot time. You can do so by typing:
+```sh
+sudo bash /home/pi/Pi-Somfy/installService.sh
+```
+The service will be installed as a system service right after establishing network connectivity.
+If you want to stop the service simply type:
+```sh
+sudo systemctl stop shutters.service
+```  
+If you want to start the service simply type:
+```sh
+sudo systemctl start shutters.service
+```  
+If you want to restart the service simply type:
+```sh
+sudo systemctl restart shutters.service
+```  
+Note, currently the service expects python3 for starting up. 
+If you went the python 2.7 path change the following line in shutters.service file before your installation
+```
+ExecStart=sudo /usr/bin/python3 /home/pi/Pi-Somfy/operateShutters.py -c /home/pi/Pi-Somfy/operateShutters.conf -a -e -m
+```
+to
+```
+ExecStart=sudo /usr/bin/python2.7 /home/pi/Pi-Somfy/operateShutters.py -c /home/pi/Pi-Somfy/operateShutters.conf -a -e -m
+```
+
+6. Finally, the recommended way to operate it is using a systemd service on boot time. You can do so by typing:
 ```sh
 sudo crontab –e 
 ```
