@@ -98,7 +98,8 @@ class MQTT(threading.Thread, MyLog):
         self.t = paho.Client(client_id="somfy-mqtt-bridge")                           #create client object
         
         # Startup the mqtt listener
-        self.t.username_pw_set(username=self.config.MQTT_User,password=self.config.MQTT_Password)
+        if not self.config.MQTT_Password.strip():
+           self.t.username_pw_set(username=self.config.MQTT_User,password=self.config.MQTT_Password)
         self.t.connect(self.config.MQTT_Server,self.config.MQTT_Port)
         self.t.on_connect = self.on_connect
         self.t.on_message = self.receiveMessageFromMQTT
