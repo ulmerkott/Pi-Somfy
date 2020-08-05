@@ -326,10 +326,10 @@ class Scheduler(threading.Thread, MyLog):
                                     s = eventDetail[1][2:].strip()
                                     s1 = int(s) if s else -1
                                     if (0 < s1 < 100):
-                                        if (self.shutter.getPosition(shutterId) <= s1):   #Is Shutter below requested Position?
+                                        if (self.shutter.getPosition(shutterId) < s1):   #Is Shutter below requested Position?
                                             self.shutter.risePartial(shutterId, s1)
                                         else:
-                                            self.LogWarn("Send action \""+eventDetail[1]+"\" to shutterId \""+shutterId+"\" was canceled! Shutter was already above requested position")                                      
+                                            self.LogWarn("Send action \""+eventDetail[1]+"\" to shutterId \""+shutterId+"\" was canceled! Shutter was already at same or above requested position")                                      
                                     else :  
                                         for i in range(self.config.SendRepeat):
                                             self.shutter.rise(shutterId)
@@ -338,10 +338,10 @@ class Scheduler(threading.Thread, MyLog):
                                     s = eventDetail[1][4:].strip()
                                     s1 = int(s) if s else -1
                                     if (0 < s1 < 100):
-                                        if (self.shutter.getPosition(shutterId) >= s1):   #Is Shutter above requested Position?
+                                        if (self.shutter.getPosition(shutterId) > s1):   #Is Shutter above requested Position?
                                             self.shutter.lowerPartial(shutterId, s1)
                                         else:
-                                            self.LogWarn("Send action \""+eventDetail[1]+"\" to shutterId \""+shutterId+"\" was canceled! Shutter was already below requested position")                                         
+                                            self.LogWarn("Send action \""+eventDetail[1]+"\" to shutterId \""+shutterId+"\" was canceled! Shutter was already at same or below requested position")                                         
                                     else :  
                                         for i in range(self.config.SendRepeat):
                                             self.shutter.lower(shutterId)
