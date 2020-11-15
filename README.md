@@ -84,7 +84,7 @@ sudo apt-get install python-pip
 Next, we need to install the PIGPIO libraries, to do so, type:
 
 ```sh
-sudo apt-get install pigpio python-pigpio python3-pigpio
+sudo apt-get install pigpio
 ```
 
 Next install the required Python Libraries:

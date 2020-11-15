@@ -2,3 +2,4 @@ ephem
 configparser
 Flask
 paho-mqtt
+pigpio
