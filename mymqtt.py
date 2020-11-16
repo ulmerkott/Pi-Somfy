@@ -12,8 +12,6 @@ import pigpio
 import socket
 import signal, atexit, subprocess, traceback
 import threading
-import copy
-import json
 
 try:
     # pip3 install paho-mqtt
@@ -23,24 +21,6 @@ except Exception as e1:
     print("\n\nThis program requires the modules located from the same github repository that are not present.\n")
     print("Error: " + str(e1))
     sys.exit(2)
-
-
-class DiscoverMsg():
-    DISCOVERY_MSG = {"name": "",
-                     "command_topic": "somfy/%s/level/cmd",
-                     "position_topic": "somfy/'+shutterId+'/level/set_state",
-                     "set_position_topic": "somfy/'+shutterId+'/level/cmd",
-                     "payload_open": "100",
-                     "payload_close": "0",
-                     "state_open": "100",
-                     "state_closed": "0"}
-    def __init__(self, shutter, shutterId):
-        self.discover_msg = copy.deepcopy(DiscoverMsg.DISCOVERY_MSG)
-        self.discover_msg["name"] = shutter
-        self.discover_msg["command_topic"] = DiscoverMsg.DISCOVERY_MSG % shutterId
-        self.discover_msg["position_topic"] = DiscoverMsg.DISCOVERY_MSG % shutterId
-        self.discover_msg["set_postion_topic"] = DiscoverMsg.DISCOVERY_MSG % shutterId
-        return json.dumps(self.discover_msg)
 
 
 class MQTT(threading.Thread, MyLog):
@@ -97,7 +77,7 @@ class MQTT(threading.Thread, MyLog):
         
     def sendStartupInfo(self):
         for shutter, shutterId in sorted(self.config.ShuttersByName.items(), key=lambda kv: kv[1]):
-            self.sendMQTT("homeassistant/cover/"+shutterId+"/config", DiscoverMsg(shutter, shutterId))
+            self.sendMQTT("homeassistant/cover/"+shutterId+"/config", '{"name": "'+shutter+'", "command_topic": "somfy/'+shutterId+'/level/cmd", "position_topic": "somfy/'+shutterId+'/level/set_state", "set_position_topic": "somfy/'+shutterId+'/level/cmd", "payload_open": "100", "payload_close": "0", "state_open": "100", "state_closed": "0"}')
 
     def on_connect(self, client, userdata, flags, rc):
         self.LogInfo("Connected to MQTT with result code "+str(rc))
