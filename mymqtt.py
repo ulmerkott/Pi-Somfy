@@ -95,21 +95,29 @@ class MQTT(threading.Thread, MyLog):
     def run(self):
         self.LogInfo("Entering MQTT polling loop")
 
-        self.t = paho.Client(client_id="somfy-mqtt-bridge")                           #create client object
-        
-        # Startup the mqtt listener
+        # Setup the mqtt client
+        self.t = paho.Client(client_id="somfy-mqtt-bridge")
         if not (self.config.MQTT_Password.strip() == ""):
            self.t.username_pw_set(username=self.config.MQTT_User,password=self.config.MQTT_Password)
-        self.t.connect(self.config.MQTT_Server,self.config.MQTT_Port)
         self.t.on_connect = self.on_connect
         self.t.on_message = self.receiveMessageFromMQTT
-        self.LogInfo("Starting Listener Thread to listen to messages from MQTT")
-        self.t.loop_start()
-
-        if self.config.EnableDiscovery == True:
-            self.sendStartupInfo()
-            
         self.shutter.registerCallBack(self.set_state)
+        
+        # Startup the mqtt listener
+        error = 0
+        while not self.shutdown_flag.is_set():
+            # Loop until the server is available
+            try:
+                self.t.connect(self.config.MQTT_Server,self.config.MQTT_Port)
+                self.LogInfo("Starting Listener Thread to listen to messages from MQTT")
+                self.t.loop_start()
+                if self.config.EnableDiscovery == True:
+                    self.sendStartupInfo()
+                break
+            except Exception as e:
+                error += 1
+                self.LogInfo("Exception in MQTT connect " + str(error) + ": "+ str(e.args))
+                time.sleep(10 + error*5) #Wait some time before re-connecting
 
         error = 0
         while not self.shutdown_flag.is_set():
