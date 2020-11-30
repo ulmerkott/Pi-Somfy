@@ -108,9 +108,8 @@ class MQTT(threading.Thread, MyLog):
         while not self.shutdown_flag.is_set():
             # Loop until the server is available
             try:
+                self.LogInfo("Connecting to MQTT server")
                 self.t.connect(self.config.MQTT_Server,self.config.MQTT_Port)
-                self.LogInfo("Starting Listener Thread to listen to messages from MQTT")
-                self.t.loop_start()
                 if self.config.EnableDiscovery == True:
                     self.sendStartupInfo()
                 break
@@ -121,17 +120,15 @@ class MQTT(threading.Thread, MyLog):
 
         error = 0
         while not self.shutdown_flag.is_set():
-            # Loop and poll for incoming Echo requests
+            # Loop and poll for incoming requests
             try:
-                # Allow time for a ctrl-c to stop the process
-                time.sleep(2)
+                #NOTE: Timeout value must be smaller than MQTT keep_alive (which is 60s by default)
+                self.t.loop(timeout=30)
             except Exception as e:
                 error += 1
                 self.LogInfo("Critical exception " + str(error) + ": "+ str(e.args))
-                print("Trying not to shut down MQTT")
                 time.sleep(0.5) #Wait half a second when an exception occurs
-        
-        self.t.loop_stop()
+
         self.LogError("Received Signal to shut down MQTT thread")
         return
 
