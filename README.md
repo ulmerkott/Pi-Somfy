@@ -84,19 +84,19 @@ sudo apt-get install python-pip
 Next, we need to install the PIGPIO libraries, to do so, type:
 
 ```sh
-sudo apt-get install pigpio python-pigpio python3-pigpio
+sudo apt-get install pigpio
 ```
 
 Next install the required Python Libraries:
 
 ```sh
-sudo pip3 install ephem configparser Flask paho-mqtt
+sudo pip3 install -r requirements.txt
 ```
    
 If you decided to use Python 2, the last command will read instead:
 
 ```sh
-sudo pip install ephem configparser Flask paho-mqtt
+sudo pip install -r requirements.txt
 ```
 
 Next, let's test if it all works. Start <operateShutters.py> by typing:
