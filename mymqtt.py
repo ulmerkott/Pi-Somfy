@@ -95,35 +95,40 @@ class MQTT(threading.Thread, MyLog):
     def run(self):
         self.LogInfo("Entering MQTT polling loop")
 
-        self.t = paho.Client(client_id="somfy-mqtt-bridge")                           #create client object
-        
-        # Startup the mqtt listener
+        # Setup the mqtt client
+        self.t = paho.Client(client_id="somfy-mqtt-bridge")
         if not (self.config.MQTT_Password.strip() == ""):
            self.t.username_pw_set(username=self.config.MQTT_User,password=self.config.MQTT_Password)
-        self.t.connect(self.config.MQTT_Server,self.config.MQTT_Port)
         self.t.on_connect = self.on_connect
         self.t.on_message = self.receiveMessageFromMQTT
-        self.LogInfo("Starting Listener Thread to listen to messages from MQTT")
-        self.t.loop_start()
-
-        if self.config.EnableDiscovery == True:
-            self.sendStartupInfo()
-            
         self.shutter.registerCallBack(self.set_state)
+        
+        # Startup the mqtt listener
+        error = 0
+        while not self.shutdown_flag.is_set():
+            # Loop until the server is available
+            try:
+                self.LogInfo("Connecting to MQTT server")
+                self.t.connect(self.config.MQTT_Server,self.config.MQTT_Port)
+                if self.config.EnableDiscovery == True:
+                    self.sendStartupInfo()
+                break
+            except Exception as e:
+                error += 1
+                self.LogInfo("Exception in MQTT connect " + str(error) + ": "+ str(e.args))
+                time.sleep(10 + error*5) #Wait some time before re-connecting
 
         error = 0
         while not self.shutdown_flag.is_set():
-            # Loop and poll for incoming Echo requests
+            # Loop and poll for incoming requests
             try:
-                # Allow time for a ctrl-c to stop the process
-                time.sleep(2)
+                #NOTE: Timeout value must be smaller than MQTT keep_alive (which is 60s by default)
+                self.t.loop(timeout=30)
             except Exception as e:
                 error += 1
                 self.LogInfo("Critical exception " + str(error) + ": "+ str(e.args))
-                print("Trying not to shut down MQTT")
                 time.sleep(0.5) #Wait half a second when an exception occurs
-        
-        self.t.loop_stop()
+
         self.LogError("Received Signal to shut down MQTT thread")
         return
 
