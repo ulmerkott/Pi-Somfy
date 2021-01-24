@@ -96,7 +96,7 @@ class MQTT(threading.Thread, MyLog):
         self.LogInfo("Entering MQTT polling loop")
 
         # Setup the mqtt client
-        self.t = paho.Client(client_id="somfy-mqtt-bridge")
+        self.t = paho.Client(client_id=self.config.MQTT_ClientID)
         if not (self.config.MQTT_Password.strip() == ""):
            self.t.username_pw_set(username=self.config.MQTT_User,password=self.config.MQTT_Password)
         self.t.on_connect = self.on_connect

@@ -27,6 +27,7 @@ class MyConfig (MyLog):
         self.HTTPPort = 80
         self.HTTPSPort = 443
         self.RTS_Address = "0x279620"
+        self.MQTT_ClientID = "somfy-mqtt-bridge"
         self.Shutters = {}
         self.ShuttersByName = {}
         self.Schedule = {}
@@ -60,7 +61,7 @@ class MyConfig (MyLog):
                 self.LogErrorLine("Missing config file or config file entries in Section General for key "+key+": " + str(e1))
                 return False
 
-        parameters = {'MQTT_Server': str, 'MQTT_Port': int, 'MQTT_User': str, 'MQTT_Password': str, 'EnableDiscovery': bool}
+        parameters = {'MQTT_Server': str, 'MQTT_Port': int, 'MQTT_User': str, 'MQTT_Password': str, 'MQTT_ClientID': str, 'EnableDiscovery': bool}
         
         self.SetSection("MQTT");
         for key, type in parameters.items():
