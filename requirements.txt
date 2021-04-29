@@ -3,3 +3,4 @@ configparser
 Flask
 paho-mqtt
 pigpio
+requests
