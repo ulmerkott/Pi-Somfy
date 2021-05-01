@@ -315,6 +315,41 @@ mosquitto_pub -h 192.168.x.x -p 1883 -u [username]-P [password] -t 'somfy/0x2670
 
 Those 2 command will lower and rise your shutters.
 
+## Build docker image
+While the docker image can be used on any raspberry pi with docker support, this part will focus on getting it up and running on a Raspberry Pi running Homeassistant on Hassio.
+
+Open defaultConfig.conf in an editor and change MQTT_Server to the host of your homeassistant server, most likely just "homeassistant". Also change the MQTT_User and Password accordingly.
+
+Build the docker image with:
+```
+docker build . -t pi-somfy:latest
+```
+
+Install the portainer addon in Homeassitant. While Portainer supports upload and import of a docker image directly in the UI. There is a bug which limits the file size to something around 1MiB, which makes it practically useless. To workaround this you can either create a local docker registry, or upload it to something like Docker Hub.
+
+If you have enabled ssh login to Hassio (note actual Hassio, not Homeassistant. See https://developers.home-assistant.io/docs/operating-system/debugging/ for more info) you can also just copy the image directly to hassio with scp.
+
+Copy the image to hassio via ssh:
+```
+docker save pi-somfy:latest > pi-somfy.tar
+ssh <your-hassio-host>
+login
+cd /mnt/data
+scp <host-where-image-is>:<path-to-image>/pi-somfy.tar
+docker load < pi-somfy.tar
+rm pi-somfy.tar
+```
+
+Go to Portainer in Homeassistant UI and add the container "somfy-pi" with the following settings:
+- Click "Advanced mode" to enable starting existing image without registry.
+- Type "pi-somfy:latest" under "Image"
+- Disable "Always pull the image"
+- Under "Publish a new network port": 8080 --> 80
+- Enable "Privileged mode" under "Runtime & Resources". This is for GPIO to work.
+- Enable "Always" under "Restart policy" tab to have it start automatically with Homeassistant.
+
+Click "Deploy the container", wait a bit. The Pi-Somfy Web UI should now be accessible from homeassistant:8080.
+
 ## 8 Credits
 This Library was ported from [Arduino sketch](https://github.com/Nickduino/Somfy_Remote) onto the Pi by @Nickduino to open and close his blinds automatically. 
 
